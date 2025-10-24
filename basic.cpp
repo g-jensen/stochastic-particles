@@ -1,11 +1,6 @@
 #include <iostream>
-#include <cmath>
+#include "distribution.h"
 #include "simulation.h"
-
-// Inverse of f(t) = 1 - e^{-t/mean}.
-float exponential_distribution(float rand, float mean) {
-  return -mean * log(1-rand);
-}
 
 int main() {
   float mean = 1.f;
