@@ -22,12 +22,4 @@ public:
       particles.push_back(p);
     }
   }
-
-  float averge_lifespan() {
-    float lifespan_sum = 0;
-    for (particle& p : particles) {
-      lifespan_sum += p.lifespan;
-    }
-    return lifespan_sum / particles.size();
-  }
 };
