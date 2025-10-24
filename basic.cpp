@@ -7,6 +7,6 @@ int main() {
   auto death_distribution_fn = [mean](float rand) {return exponential_distribution(rand,mean);};
   int particle_count = 1000;
 
-  simulation sim(death_distribution_fn,particle_count);
+  simulation sim(death_distribution_fn,particle_count,1.f);
   std::cout << sim.averge_lifespan() << std::endl;
 }

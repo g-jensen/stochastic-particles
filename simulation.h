@@ -5,7 +5,7 @@
 #include <vector>
 
 struct particle {
-  float x;
+  float velocity;
   float lifespan;
 };
 
@@ -15,10 +15,10 @@ public:
   std::function<float(float)> death_distribution_fn;
   std::vector<particle> particles;
   
-  simulation(std::function<float(float)> death_distribution_fn, uint particle_count) {
+  simulation(std::function<float(float)> death_distribution_fn, uint particle_count, float velocity) {
     this->death_distribution_fn = death_distribution_fn;
     for (uint i = 0; i < particle_count; i++) {
-      particle p = {.x=0, .lifespan=death_distribution_fn(random_probability())};
+      particle p = {.velocity=velocity, .lifespan=death_distribution_fn(random_probability())};
       particles.push_back(p);
     }
   }
