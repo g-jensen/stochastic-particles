@@ -1,6 +1,6 @@
 #include <iostream>
-#include "distribution.h"
-#include "simulation.h"
+#include "../distribution.h"
+#include "../simulation.h"
 
 int main() {
   float mean = 1.f;
