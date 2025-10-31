@@ -2,6 +2,7 @@
 #include "../distribution.h"
 #include "../simulation.h"
 #include "../particle.h"
+#include "../io.h"
 
 uint surivial_count(simulation& sim, float length) {
   uint count = 0;
@@ -31,14 +32,10 @@ int main() {
     };
   };
 
-  auto print_fn = [&](float velocity) {
-    std::cout << "v=" << std::to_string(velocity) << ":   " << average(simulate_fn(velocity),1000) << std::endl;
-  };
- 
   std::cout << "Survival Rates with Velocity v:" << std::endl;
-  print_fn(0.f);
-  print_fn(0.25f);
-  print_fn(0.5f);
-  print_fn(1.f);
-  print_fn(2.f);
+  print_simulated_average(simulate_fn,0.f);
+  print_simulated_average(simulate_fn,0.25f);
+  print_simulated_average(simulate_fn,0.5f);
+  print_simulated_average(simulate_fn,1.f);
+  print_simulated_average(simulate_fn,2.f);
 }
