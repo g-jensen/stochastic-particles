@@ -1,0 +1,2 @@
+- [ ] calling death_distribution should assert the params are valid
+- [ ] make survival_rate.cpp cout more useful
