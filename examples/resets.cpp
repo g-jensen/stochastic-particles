@@ -63,6 +63,11 @@ int main() {
   print_fn(0.5f);
   print_fn(1.f);
   print_fn(2.f);
+
+  // for (float v = 0; v < 20; v += 0.25) {
+  //   std::vector<float> survival_rates = simulate_fn(v);
+  //   std::cout << "(" << v << ", " << std::to_string(expected_resets(survival_rates)) << ")" << std::endl;
+  // }
 }
 
 /* Sample Output:
