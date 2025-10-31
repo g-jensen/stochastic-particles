@@ -12,6 +12,10 @@ uint surivial_count(simulation& sim, float length) {
   return count;
 }
 
+float survival_rate(simulation& sim, float length) {
+  return (float)surivial_count(sim,length) / sim.particles.size();
+}
+
 int main() {
   float mean_lifespan = 1.f;
   float length = 1.f;
@@ -21,7 +25,8 @@ int main() {
   auto simulate_fn = [&](float velocity) {
     return [&, velocity]() {
       simulation sim(death_distribution_fn,particle_count,velocity);
-      return (float)surivial_count(sim,length) / sim.particles.size();
+      sim.init();
+      return survival_rate(sim,length);
     };
   };
 

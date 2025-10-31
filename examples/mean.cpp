@@ -16,5 +16,6 @@ int main() {
   int particle_count = 1000;
 
   simulation sim(death_distribution_fn,particle_count,1.f);
+  sim.init();
   std::cout << averge_lifespan(sim) << std::endl;
 }
