@@ -1,11 +1,12 @@
 #include <iostream>
 #include "../distribution.h"
 #include "../simulation.h"
+#include "../particle.h"
 
 uint surivial_count(simulation& sim, float length) {
   uint count = 0;
   for (particle& p : sim.particles) {
-    if (p.velocity*p.lifespan >= length) {
+    if (particle_surives(p,length)) {
       count++;
     }
   }

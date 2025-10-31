@@ -1,13 +1,9 @@
 #pragma once
 
-#include "rand.h"
 #include <functional>
 #include <vector>
-
-struct particle {
-  float velocity;
-  float lifespan;
-};
+#include "rand.h"
+#include "particle.h"
 
 class simulation {
 public:
