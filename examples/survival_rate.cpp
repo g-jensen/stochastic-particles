@@ -29,7 +29,7 @@ int main() {
       return survival_rate(sim,length);
     };
   };
-
+ 
   std::cout << "Survival Rates with Velocity v:" << std::endl;
   std::cout << "v=0:    " << average(simulate_fn(0.f),1000) << std::endl;
   std::cout << "v=0.25: " << average(simulate_fn(0.25f),1000) << std::endl;
