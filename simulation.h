@@ -22,7 +22,11 @@ public:
   }
 
   particle create_particle() {
-    return {.velocity=velocity, .lifespan=death_distribution_fn(random_probability())};
+    return {
+      .state = particle_state::ALIVE,
+      .velocity=velocity,
+      .lifespan=death_distribution_fn(random_probability())
+    };
   }
 
 private:
