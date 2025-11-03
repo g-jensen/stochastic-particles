@@ -34,7 +34,7 @@ int main() {
     std::cout << "v=" << std::to_string(velocity) << ":   {simulated_value: " << std::to_string(simulate_fn(velocity)) << ", actual_value: " << std::to_string(exp(1 / - (velocity* mean_lifespan))) << "}" << std::endl;
   };
 
-  std::cout << "Survival Rates with Velocity v:" << std::endl;
+  std::cout << "Survival rates with mean lifespan " << mean_lifespan << " and velocity v:" << std::endl;
   print_fn(0.f);
   print_fn(0.25f);
   print_fn(0.5f);
