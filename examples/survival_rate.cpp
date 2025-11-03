@@ -30,10 +30,14 @@ int main() {
     return survival_rate(sim,length);
   };
 
+  auto print_fn = [&](float velocity) {
+    std::cout << "v=" << std::to_string(velocity) << ":   {simulated_value: " << std::to_string(simulate_fn(velocity)) << ", actual_value: " << std::to_string(exp(1 / - (velocity* mean_lifespan))) << "}" << std::endl;
+  };
+
   std::cout << "Survival Rates with Velocity v:" << std::endl;
-  print_simulated_value(simulate_fn,0.f);
-  print_simulated_value(simulate_fn,0.25f);
-  print_simulated_value(simulate_fn,0.5f);
-  print_simulated_value(simulate_fn,1.f);
-  print_simulated_value(simulate_fn,2.f);
+  print_fn(0.f);
+  print_fn(0.25f);
+  print_fn(0.5f);
+  print_fn(1.f);
+  print_fn(2.f);
 }

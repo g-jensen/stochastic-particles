@@ -1,3 +1,3 @@
 - [ ] calling death_distribution should assert the params are valid
-- [ ] make survival_rate.cpp cout more useful
+- [x] make survival_rate.cpp cout ore useful
 - [ ] move .h impls to proper .cpp file and create Makefile

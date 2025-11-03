@@ -52,8 +52,8 @@ int main() {
   auto print_fn = [&](float velocity) {
     std::vector<float> survival_rates = simulate_fn(velocity);
     std::cout << "v=" << std::to_string(velocity) << ":   " 
-              << "{expected_resets: " << std::to_string(expected_resets(survival_rates)) << "}," 
-              << "{distribution: [" <<  stringify_vals(survival_rates) << "]}"
+              << "{expected_resets: " << std::to_string(expected_resets(survival_rates)) << ", " 
+              << "distribution: [" <<  stringify_vals(survival_rates) << "]}"
               << std::endl;
   };
 

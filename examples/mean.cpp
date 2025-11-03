@@ -17,5 +17,5 @@ int main() {
 
   simulation sim(death_distribution_fn,particle_count,1.f);
   sim.init();
-  std::cout << averge_lifespan(sim) << std::endl;
+  std::cout << "{simulated_mean: " << averge_lifespan(sim) << ", actual_mean: " << mean << "}" << std::endl;
 }

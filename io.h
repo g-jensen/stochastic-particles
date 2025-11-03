@@ -14,7 +14,3 @@ inline std::string stringify_vals(std::vector<T> v) {
   }
   return s;
 }
-
-void print_simulated_value(std::function<float(float)> simulate_fn, float velocity) {
-  std::cout << "v=" << std::to_string(velocity) << ":   " << simulate_fn(velocity) << std::endl;
-}
