@@ -57,7 +57,7 @@ int main() {
               << std::endl;
   };
 
-  std::cout << "Resets with velocity v:" << std::endl;
+  std::cout << "Resets with mean lifespan " << mean_lifespan <<  " and velocity v:" << std::endl;
   print_fn(0.f);
   print_fn(0.25f);
   print_fn(0.5f);
@@ -72,7 +72,7 @@ int main() {
 
 /* Sample Output:
 
-Resets with velocity v:
+Resets with mean lifespan 1 and velocity v:
 v=0.000000:   {expected_resets: 0.000000},{distribution: [1.000000]}
 v=0.250000:   {expected_resets: 0.018635},{distribution: [0.981707, 0.017957, 0.000330, 0.000006, 0.000000]}
 v=0.500000:   {expected_resets: 0.156528},{distribution: [0.864668, 0.117002, 0.015851, 0.002144, 0.000290, 0.000039, 0.000006, 0.000001, 0.000000]}
