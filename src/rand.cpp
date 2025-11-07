@@ -1,7 +1,4 @@
-#pragma once
-
-#include <random>
-#include <functional>
+#include "../headers/rand.h"
 
 std::uniform_real_distribution<> dis(0.0, 1.0);
 std::random_device rd;

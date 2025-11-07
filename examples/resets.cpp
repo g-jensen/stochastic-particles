@@ -1,7 +1,7 @@
 #include <iostream>
-#include "../distribution.h"
-#include "../simulation.h"
-#include "../io.h"
+#include "../headers/distribution.h"
+#include "../headers/simulation.h"
+#include "../headers/io.h"
 
 uint simulate_reset(simulation& sim, float length) {
   uint count = 0;
