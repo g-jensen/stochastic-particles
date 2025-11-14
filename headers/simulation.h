@@ -13,6 +13,7 @@ public:
 
   void init();
   particle create_particle();
+  particle create_particle(float initial_wait);
 
 private:
   // assumes 0 <= input <= 1 and 0 <= output <= inf

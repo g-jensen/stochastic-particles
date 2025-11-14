@@ -21,7 +21,7 @@ float mod(float a, float b) {
 }
 
 bool particle_passes_gate(particle p, gate g, float length) {
-  float t = length / p.velocity; // time that it takes for the particle to go `length`
+  float t = (length / p.velocity) + p.initial_wait; // time that it takes for the particle to go `length`
   float m = mod(t,g.t1+g.t2);
   bool b = (0 <= m && m < g.t1);
   return g.starting_state ? !b : b;
@@ -30,7 +30,7 @@ bool particle_passes_gate(particle p, gate g, float length) {
 uint simulate_reset(simulation& sim, float length, gate g) {
   uint count = 0;
   for (particle& p : sim.particles) {
-    if (particle_surives(p,length) && particle_passes_gate(p,g,length)) {
+    if (particle_travels_length(p,length) && particle_passes_gate(p,g,length)) {
       p=sim.create_particle();
       count++;
     } else {
@@ -60,6 +60,7 @@ int main() {
   int particle_count = 1000000;
 
   gate g = {.starting_state=0,.t1=1.f,.t2=1.f};
+  float initial_wait = 0.f;
 
   auto simulate_fn = [&](float velocity) {
     simulation sim(death_distribution_fn,particle_count,velocity);
@@ -70,7 +71,7 @@ int main() {
   auto print_fn = [&](float velocity) {
     std::vector<float> survival_rates = simulate_fn(velocity);
     std::cout << "v=" << std::to_string(velocity) << ":   " 
-              << "distribution: [" <<  stringify_vals(survival_rates) << "]}"
+              << "distribution: [" <<  stringify_vals(survival_rates) << "]"
               << std::endl;
   };
 
