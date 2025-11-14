@@ -13,4 +13,4 @@ struct particle {
   float lifespan;
 };
 
-uint particle_surives(particle& p, float length);
+bool particle_surives(particle& p, float length);
