@@ -11,6 +11,7 @@ struct particle {
   particle_state state;
   float velocity;
   float lifespan;
+  float initial_wait = 0.f;
 };
 
-bool particle_surives(particle& p, float length);
+bool particle_travels_length(particle& p, float length);

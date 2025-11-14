@@ -6,7 +6,7 @@
 uint simulate_reset(simulation& sim, float length) {
   uint count = 0;
   for (particle& p : sim.particles) {
-    if (particle_surives(p,length)) {
+    if (particle_travels_length(p,length)) {
       p=sim.create_particle();
       count++;
     } else {
