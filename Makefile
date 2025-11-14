@@ -16,5 +16,9 @@ resets: src
 survival_rate: src
 	g++ -o survival_rate examples/survival_rate.cpp *.o
 
+.PHONY: gate
+gate: src
+	g++ -o gate examples/gate.cpp *.o
+
 clean:
 	rm -f *.o
