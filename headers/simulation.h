@@ -12,6 +12,7 @@ public:
   simulation(std::function<float(float)> death_distribution_fn, uint particle_count, float velocity);
 
   void init();
+  void init(float initial_wait);
   particle create_particle();
   particle create_particle(float initial_wait);
 

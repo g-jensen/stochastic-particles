@@ -14,6 +14,12 @@ void simulation::init() {
   }
 }
 
+void simulation::init(float initial_wait) {
+  for (uint i = 0; i < particle_count; i++) {
+    particles.push_back(create_particle(initial_wait));
+  }
+}
+
 particle simulation::create_particle() {
     return {
       .state = particle_state::ALIVE,
@@ -21,3 +27,9 @@ particle simulation::create_particle() {
       .lifespan=death_distribution_fn(random_probability())
     };
   }
+
+particle simulation::create_particle(float initial_wait) {
+  particle p = create_particle();
+  p.initial_wait = initial_wait;
+  return p;
+}
