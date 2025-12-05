@@ -1,6 +1,6 @@
 #include "../headers/particle.h"
 
-bool particle_travels_length(particle& p, float length) {
+bool particle_does_lap(particle& p, float length) {
   return p.state == particle_state::ALIVE 
-         && p.velocity*(p.lifespan - p.initial_wait) >= length;
+         && p.velocity*(p.lifespan - p.initial_wait) >= 2*length;
 }

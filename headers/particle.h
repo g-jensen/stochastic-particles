@@ -14,4 +14,4 @@ struct particle {
   float initial_wait = 0.f;
 };
 
-bool particle_travels_length(particle& p, float length);
+bool particle_does_lap(particle& p, float length);

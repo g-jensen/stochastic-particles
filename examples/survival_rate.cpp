@@ -6,7 +6,7 @@
 uint surivial_count(simulation& sim, float length) {
   uint count = 0;
   for (particle& p : sim.particles) {
-    if (particle_travels_length(p,length)) {
+    if (particle_does_lap(p,length)) {
       count++;
     }
   }
@@ -30,7 +30,7 @@ int main() {
   };
 
   auto print_fn = [&](float velocity) {
-    std::cout << "v=" << std::to_string(velocity) << ":   {simulated_value: " << std::to_string(simulate_fn(velocity)) << ", actual_value: " << std::to_string(exp(1 / - (velocity* mean_lifespan))) << "}" << std::endl;
+    std::cout << "v=" << std::to_string(velocity) << ":   {simulated_value: " << std::to_string(simulate_fn(velocity)) << ", actual_value: " << std::to_string(exp((2*length) / - (velocity* mean_lifespan))) << "}" << std::endl;
   };
 
   std::cout << "Survival rates with mean lifespan " << mean_lifespan << " and velocity v:" << std::endl;

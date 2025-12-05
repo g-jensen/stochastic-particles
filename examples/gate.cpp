@@ -38,7 +38,7 @@ int main() {
   gate g = {.starting_state=1,.t1=1.f,.t2=1.f};
 
   auto should_reset_fn = [&](particle p){
-    return particle_travels_length(p,length) && particle_passes_gate(p,g,length);
+    return particle_does_lap(p,length) && particle_passes_gate(p,g,length);
   };
 
   auto simulate_fn = [&](float velocity, float initial_wait) {

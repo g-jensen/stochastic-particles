@@ -15,7 +15,7 @@ int main() {
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   int particle_count = 1000000;
 
-  auto should_reset_fn = [&](particle p){return particle_travels_length(p,length);};
+  auto should_reset_fn = [&](particle p){return particle_does_lap(p,length);};
 
   auto simulate_fn = [&](float velocity) {
     simulation sim(death_distribution_fn,particle_count,velocity);
