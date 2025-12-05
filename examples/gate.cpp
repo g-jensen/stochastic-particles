@@ -30,7 +30,7 @@ bool particle_passes_gate(particle p, gate g, float length) {
 }
 
 int main() {
-  float mean_lifespan = 1.f;
+  float mean_lifespan = 2.f;
   float length = 1.f;
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   int particle_count = 1000000;
@@ -59,13 +59,4 @@ int main() {
   for (float wait = 0.f; wait <= 15.f; wait+=0.1f) {
     print_fn(1.f,wait);
   }
-  // print_fn(0.f);
-  // print_fn(0.25f);
-  // print_fn(0.5f);
-  // print_fn(0.75f);
-  // print_fn(1.f);
-  // print_fn(1.25f);
-  // print_fn(1.50f);
-  // print_fn(1.75f);
-  // print_fn(2.f);
 }

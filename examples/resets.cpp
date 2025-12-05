@@ -10,7 +10,7 @@ float expected_resets(std::vector<float> reset_probabilities) {
 }
 
 int main() {
-  float mean_lifespan = 1.f;
+  float mean_lifespan = 2.f;
   float length = 1.f;
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   int particle_count = 1000000;
