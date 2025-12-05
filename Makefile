@@ -1,4 +1,4 @@
-all: mean resets survival_rate
+all: mean resets survival_rate gate
 
 .PHONY: src
 src: src/* headers/*
