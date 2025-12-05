@@ -2,6 +2,7 @@
 #include "../headers/distribution.h"
 #include "../headers/simulation.h"
 #include "../headers/io.h"
+#include "../headers/reset.h"
 
 struct gate {
   bool starting_state;
@@ -17,7 +18,7 @@ std::string gate_to_string(gate g) {
 }
 
 float mod(float a, float b) {
-  return a - b * ((int)a / (int)b);
+  return a - b * (int)((int)a / (int)b);
 }
 
 bool particle_passes_gate(particle p, gate g, float length) {
@@ -27,44 +28,22 @@ bool particle_passes_gate(particle p, gate g, float length) {
   return g.starting_state ? !b : b;
 }
 
-uint simulate_reset(simulation& sim, float length, gate g) {
-  uint count = 0;
-  for (particle& p : sim.particles) {
-    if (particle_travels_length(p,length) && particle_passes_gate(p,g,length)) {
-      p=sim.create_particle();
-      count++;
-    } else {
-      p.state=particle_state::DEAD;
-    }
-  }
-  return count;
-}
-
-std::vector<float> survival_rates(simulation& sim, float length, gate g) {
-  std::vector<float> survival_rates;
-  const uint particle_count = sim.particles.size();
-  uint prev_survival_count;
-  uint survival_count = particle_count;
-  do {
-    prev_survival_count = survival_count;
-    survival_count = simulate_reset(sim,length,g);
-    survival_rates.push_back((float)(prev_survival_count - survival_count) / particle_count);
-  } while (survival_count > 0);
-  return survival_rates;
-}
-
 int main() {
   float mean_lifespan = 1.f;
   float length = 1.f;
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   int particle_count = 1000000;
 
-  gate g = {.starting_state=0,.t1=1.f,.t2=1.f};
+  gate g = {.starting_state=1,.t1=1.f,.t2=1.f};
+
+  auto should_reset_fn = [&](particle p){
+    return particle_travels_length(p,length) && particle_passes_gate(p,g,length);
+  };
 
   auto simulate_fn = [&](float velocity, float initial_wait) {
     simulation sim(death_distribution_fn,particle_count,velocity);
     sim.init(initial_wait);
-    return survival_rates(sim,length,g);
+    return survival_rates(sim,should_reset_fn);
   };
 
   auto print_fn = [&](float velocity, float initial_wait) {

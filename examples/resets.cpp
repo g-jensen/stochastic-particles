@@ -15,10 +15,12 @@ int main() {
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   int particle_count = 1000000;
 
+  auto should_reset_fn = [&](particle p){return particle_travels_length(p,length);};
+
   auto simulate_fn = [&](float velocity) {
     simulation sim(death_distribution_fn,particle_count,velocity);
     sim.init();
-    return survival_rates(sim,length); // fix me!
+    return survival_rates(sim, should_reset_fn); // fix me!
   };
 
   auto print_fn = [&](float velocity) {
