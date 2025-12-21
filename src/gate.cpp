@@ -7,10 +7,6 @@ std::string gate_to_string(gate g) {
         "}";
 }
 
-float mod(float a, float b) {
-  return a - b * (int)((int)a / (int)b);
-}
-
 bool particle_passes_gate(particle p, gate g, float length) {
   float t = (length / p.velocity) + p.initial_wait; // time that it takes for the particle to go `length`
   float m = mod(t,g.t1+g.t2);

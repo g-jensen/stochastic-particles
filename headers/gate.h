@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "particle.h"
+#include "math.h"
 
 // gate that is periodically starting_state for t1 seconds and then !starting_state for t2 seconds.
 struct gate {
