@@ -20,6 +20,12 @@ void simulation::init(float initial_wait) {
   }
 }
 
+void simulation::init(std::function<float(particle)> initial_wait_fn) {
+  for (uint i = 0; i < particle_count; i++) {
+    particles.push_back(create_particle(initial_wait_fn));
+  }
+}
+
 particle simulation::create_particle() {
     return {
       .state = particle_state::ALIVE,
@@ -31,5 +37,11 @@ particle simulation::create_particle() {
 particle simulation::create_particle(float initial_wait) {
   particle p = create_particle();
   p.wait = initial_wait;
+  return p;
+}
+
+particle simulation::create_particle(std::function<float(particle)> initial_wait_fn) {
+  particle p = create_particle();
+  p.wait = initial_wait_fn(p);
   return p;
 }
