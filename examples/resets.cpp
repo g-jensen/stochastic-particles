@@ -20,7 +20,7 @@ int main() {
   auto simulate_fn = [&](float velocity) {
     simulation sim(death_distribution_fn,particle_count,velocity);
     sim.init();
-    return survival_rates(sim, should_reset_fn);
+    return survival_rates(&sim, reset_config(should_reset_fn));
   };
 
   auto print_fn = [&](float velocity) {
