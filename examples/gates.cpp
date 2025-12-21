@@ -3,31 +3,7 @@
 #include "../headers/simulation.h"
 #include "../headers/io.h"
 #include "../headers/reset.h"
-
-// gate that is periodically starting_state for t1 seconds and then !starting_state for t2 seconds.
-struct gate {
-  bool starting_state;
-  float t1;
-  float t2;
-};
-
-std::string gate_to_string(gate g) {
-  return "{starting_state: " + std::to_string(g.starting_state) + 
-        ", t1: " + std::to_string(g.t1) + 
-        ", t2: " + std::to_string(g.t2) +
-        "}";
-}
-
-float mod(float a, float b) {
-  return a - b * (int)((int)a / (int)b);
-}
-
-bool particle_passes_gate(particle p, gate g, float length) {
-  float t = (length / p.velocity) + p.initial_wait; // time that it takes for the particle to go `length`
-  float m = mod(t,g.t1+g.t2);
-  bool b = (0 <= m && m < g.t1);
-  return g.starting_state ? !b : b;
-}
+#include "../headers/gate.h"
 
 int main() {
   float mean_lifespan = 2.f;
