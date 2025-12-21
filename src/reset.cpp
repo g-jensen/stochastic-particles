@@ -9,6 +9,26 @@ particle killed_particle(simulation* sim, particle p) {
   return p;
 }
 
+reset_config::reset_config(
+  std::function<bool(particle)> should_reset_fn, 
+  std::function<particle(simulation*,particle)> reset_particle_fn,
+  std::function<particle(simulation*,particle)> killed_particle_fn) {
+  this->should_reset_fn=should_reset_fn;
+  this->reset_particle_fn=reset_particle_fn;
+  this->killed_particle_fn=killed_particle_fn;
+}
+
+reset_config::reset_config(
+  std::function<bool(particle)> should_reset_fn) {
+  reset_config(should_reset_fn,reset_particle,killed_particle);
+}
+
+reset_config::reset_config(
+  std::function<bool(particle)> should_reset_fn, 
+  std::function<particle(simulation*,particle)> reset_particle_fn) {
+  reset_config(should_reset_fn,reset_particle_fn,killed_particle);
+}
+
 uint simulate_reset(simulation* sim, reset_config cfg) {
   uint count = 0;
   for (particle& p : sim->particles) {

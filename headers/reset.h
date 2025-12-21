@@ -12,11 +12,15 @@ struct reset_config {
   std::function<particle(simulation*,particle)> reset_particle_fn;
   std::function<particle(simulation*,particle)> killed_particle_fn;
 
-  reset_config(std::function<bool(particle)> should_reset_fn) {
-    this->should_reset_fn=should_reset_fn;
-    this->reset_particle_fn=reset_particle;
-    this->killed_particle_fn=killed_particle;
-  }
+  reset_config(
+    std::function<bool(particle)> should_reset_fn);
+  reset_config(
+    std::function<bool(particle)> should_reset_fn, 
+    std::function<particle(simulation*,particle)> reset_particle_fn);
+  reset_config(
+    std::function<bool(particle)> should_reset_fn, 
+    std::function<particle(simulation*,particle)> reset_particle_fn,
+    std::function<particle(simulation*,particle)> killed_particle_fn);
 };
 
 uint simulate_reset(simulation* sim, reset_config cfg);
