@@ -11,16 +11,22 @@ int main() {
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   int particle_count = 1000000;
 
-  gate g = {.starting_state=1,.t1=1.f,.t2=1.f};
+  gate g = {.starting_state=0,.t1=1.f,.t2=1.f};
 
   auto should_reset_fn = [&](particle p){
     return particle_does_lap(p,length) && particle_passes_gate(p,g,length);
   };
 
+  auto reset_particle = [&] (simulation* sim, particle p) {
+    particle p1 = sim->create_particle();
+    p1.elapsed_time = next_lap_elapsed(p,length);
+    return p1;
+  };
+
   auto simulate_fn = [&](float velocity, float initial_wait) {
     simulation sim(death_distribution_fn,particle_count,velocity);
     sim.init(initial_wait);
-    return survival_rates(&sim,reset_config(should_reset_fn));
+    return survival_rates(&sim,reset_config(should_reset_fn,reset_particle));
   };
 
   auto print_fn = [&](float velocity, float initial_wait) {
