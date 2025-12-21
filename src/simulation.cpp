@@ -30,6 +30,6 @@ particle simulation::create_particle() {
 
 particle simulation::create_particle(float initial_wait) {
   particle p = create_particle();
-  p.initial_wait = initial_wait;
+  p.wait = initial_wait;
   return p;
 }

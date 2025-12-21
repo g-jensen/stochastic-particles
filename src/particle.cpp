@@ -2,7 +2,7 @@
 
 bool particle_does_lap(particle& p, float length) {
   return p.state == particle_state::ALIVE 
-         && p.velocity*(p.lifespan - p.initial_wait) >= 2*length;
+         && p.velocity*(p.lifespan - p.wait) >= 2*length;
 }
 
 std::string particle_string(particle p) {
@@ -10,7 +10,7 @@ std::string particle_string(particle p) {
   s += "{";
   s += "vel:" + std::to_string(p.velocity) + ", ";
   s += "life:" + std::to_string(p.lifespan) + ", ";
-  s += "wait: " + std::to_string(p.initial_wait) + ", ";
+  s += "wait: " + std::to_string(p.wait) + ", ";
   s += "t: " + std::to_string(p.elapsed_time) + ", ";
   s += "state:" + std::to_string((int)p.state);
   s += "}";

@@ -13,7 +13,7 @@ struct particle {
   float velocity;
   float lifespan;
   float elapsed_time;
-  float initial_wait = 0.f;
+  float wait = 0.f;
 };
 
 bool particle_does_lap(particle& p, float length);
