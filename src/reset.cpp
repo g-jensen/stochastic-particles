@@ -20,13 +20,17 @@ reset_config::reset_config(
 
 reset_config::reset_config(
   std::function<bool(particle)> should_reset_fn) {
-  reset_config(should_reset_fn,reset_particle,killed_particle);
+  this->should_reset_fn=should_reset_fn;
+  this->reset_particle_fn=reset_particle;
+  this->killed_particle_fn=killed_particle;
 }
 
 reset_config::reset_config(
   std::function<bool(particle)> should_reset_fn, 
   std::function<particle(simulation*,particle)> reset_particle_fn) {
-  reset_config(should_reset_fn,reset_particle_fn,killed_particle);
+  this->should_reset_fn=should_reset_fn;
+  this->reset_particle_fn=reset_particle_fn;
+  this->killed_particle_fn=killed_particle;
 }
 
 uint simulate_reset(simulation* sim, reset_config cfg) {
