@@ -1,4 +1,4 @@
-all: mean resets survival_rate gates
+all: mean resets survival_rate gates wait_times
 
 .PHONY: src
 src: src/* headers/*
@@ -19,6 +19,10 @@ survival_rate: src
 .PHONY: gates
 gates: src
 	g++ -o gates examples/gates.cpp *.o
+
+.PHONY: wait_times
+wait_times: src
+	g++ -o wait_times examples/wait_times.cpp *.o
 
 clean:
 	rm -f *.o
