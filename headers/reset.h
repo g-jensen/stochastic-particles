@@ -26,3 +26,5 @@ struct reset_config {
 uint simulate_reset(simulation* sim, reset_config cfg);
 
 std::vector<float> survival_rates(simulation* sim, reset_config cfg);
+
+float expected_resets(std::vector<float> reset_probabilities);

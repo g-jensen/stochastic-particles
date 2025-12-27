@@ -58,3 +58,11 @@ std::vector<float> survival_rates(simulation* sim, reset_config cfg) {
   } while (survival_count > 0);
   return survival_rates;
 }
+
+float expected_resets(std::vector<float> reset_probabilities) {
+  float expected_resets = 0;
+  for (uint i = 0; i < reset_probabilities.size(); i++) {
+    expected_resets += i * reset_probabilities[i];
+  }
+  return expected_resets;
+}

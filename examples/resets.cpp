@@ -1,14 +1,6 @@
 #include "../headers/reset.h"
 #include "../headers/io.h"
 
-float expected_resets(std::vector<float> reset_probabilities) {
-  float expected_resets = 0;
-  for (uint i = 0; i < reset_probabilities.size(); i++) {
-    expected_resets += i * reset_probabilities[i];
-  }
-  return expected_resets;
-}
-
 int main() {
   float mean_lifespan = 2.f;
   float length = 1.f;
