@@ -33,6 +33,7 @@ int main() {
     std::vector<float> survival_rates = simulate_fn(velocity,initial_wait);
     std::cout << "v=" << std::to_string(velocity) << ":   " 
               << "initial_wait: " << std::to_string(initial_wait) <<"   "
+              << "expected_resets: " << std::to_string(expected_resets(survival_rates)) << ":   " 
               << "distribution: [" <<  stringify_vals(survival_rates) << "]"
               << std::endl;
   };
