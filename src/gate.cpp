@@ -13,3 +13,12 @@ bool particle_passes_gate(particle p, gate g, float length) {
   bool b = (0 <= m && m < g.t1);
   return g.starting_state ? !b : b;
 }
+
+void print(float velocity, float initial_wait, std::function<std::vector<float>(float,float)> simulate_fn) {
+  std::vector<float> survival_rates = simulate_fn(velocity,initial_wait);
+  std::cout << "v=" << std::to_string(velocity) << ":   " 
+            << "initial_wait: " << std::to_string(initial_wait) <<"   "
+            << "expected_resets: " << std::to_string(expected_resets(survival_rates)) << ":   " 
+            << "distribution: [" <<  stringify_vals(survival_rates) << "]"
+            << std::endl;
+}
