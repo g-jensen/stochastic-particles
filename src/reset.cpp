@@ -1,7 +1,9 @@
 #include "../headers/reset.h"
 
-particle reset_particle(simulation* sim, particle) {
-  return sim->create_particle();
+particle reset_particle(simulation* sim, particle p, float length) {
+  particle p1 = sim->create_particle();
+  p1.elapsed_time = next_lap_elapsed(p,length);
+  return p1;
 }
 
 particle killed_particle(simulation* sim, particle p) {
@@ -16,13 +18,6 @@ reset_config::reset_config(
   this->should_reset_fn=should_reset_fn;
   this->reset_particle_fn=reset_particle_fn;
   this->killed_particle_fn=killed_particle_fn;
-}
-
-reset_config::reset_config(
-  std::function<bool(particle)> should_reset_fn) {
-  this->should_reset_fn=should_reset_fn;
-  this->reset_particle_fn=reset_particle;
-  this->killed_particle_fn=killed_particle;
 }
 
 reset_config::reset_config(
@@ -65,4 +60,15 @@ float expected_resets(std::vector<float> reset_probabilities) {
     expected_resets += i * reset_probabilities[i];
   }
   return expected_resets;
+}
+
+std::vector<float> simulate(
+  float velocity,
+  float initial_wait,
+  uint particle_count,
+  std::function<float(float)> death_distribution_fn,
+  reset_config reset_config) {
+    simulation sim(death_distribution_fn,particle_count,velocity);
+    sim.init(initial_wait);
+    return survival_rates(&sim,reset_config);
 }

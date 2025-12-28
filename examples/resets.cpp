@@ -4,15 +4,14 @@
 int main() {
   float mean_lifespan = 2.f;
   float length = 1.f;
-  auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   int particle_count = 1000000;
 
+  auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   auto should_reset_fn = [&](particle p){return particle_does_lap(p,length);};
+  auto reset_particle_fn = [&] (simulation* sim, particle p) {return reset_particle(sim,p,length);};
 
   auto simulate_fn = [&](float velocity) {
-    simulation sim(death_distribution_fn,particle_count,velocity);
-    sim.init();
-    return survival_rates(&sim, reset_config(should_reset_fn));
+    return simulate(velocity,0,particle_count,death_distribution_fn,reset_config(should_reset_fn,reset_particle_fn));
   };
 
   auto print_fn = [&](float velocity) {
