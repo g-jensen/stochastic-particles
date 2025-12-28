@@ -1,8 +1,10 @@
 #pragma once
 
-#include "../headers/distribution.h"
-#include "../headers/simulation.h"
 #include <functional>
+#include <iostream>
+#include "distribution.h"
+#include "simulation.h"
+#include "io.h"
 
 particle reset_particle(simulation* sim, particle p, float length);
 particle killed_particle(simulation* sim, particle p);
@@ -33,3 +35,5 @@ std::vector<float> simulate(
   uint particle_count,
   std::function<float(float)> death_distribution_fn,
   reset_config reset_config);
+
+void print(float velocity, std::function<std::vector<float>(float)> simulate_fn);

@@ -72,3 +72,11 @@ std::vector<float> simulate(
     sim.init(initial_wait);
     return survival_rates(&sim,reset_config);
 }
+
+void print(float velocity, std::function<std::vector<float>(float)> simulate_fn) {
+  std::vector<float> survival_rates = simulate_fn(velocity);
+  std::cout << "v=" << std::to_string(velocity) << ":   " 
+            << "{expected_resets: " << std::to_string(expected_resets(survival_rates)) << ", " 
+            << "distribution: [" <<  stringify_vals(survival_rates) << "]}"
+            << std::endl;
+}

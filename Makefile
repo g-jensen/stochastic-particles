@@ -3,7 +3,7 @@ SPEC_DIR = spec
 LIB_DIR = lib
 DEPS_LOG = log/deps.log
 
-all: mean resets survival_rate gates wait_times
+all: mean survival_rate resets gates wait_times
 
 .PHONY: src
 src: src/* headers/*

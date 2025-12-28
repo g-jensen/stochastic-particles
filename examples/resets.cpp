@@ -14,13 +14,7 @@ int main() {
     return simulate(velocity,0,particle_count,death_distribution_fn,reset_config(should_reset_fn,reset_particle_fn));
   };
 
-  auto print_fn = [&](float velocity) {
-    std::vector<float> survival_rates = simulate_fn(velocity);
-    std::cout << "v=" << std::to_string(velocity) << ":   " 
-              << "{expected_resets: " << std::to_string(expected_resets(survival_rates)) << ", " 
-              << "distribution: [" <<  stringify_vals(survival_rates) << "]}"
-              << std::endl;
-  };
+  auto print_fn = [&](float velocity) {print(velocity,simulate_fn);};
 
   std::cout << "Resets with mean lifespan " << mean_lifespan <<  " and velocity v:" << std::endl;
   print_fn(0.f);
