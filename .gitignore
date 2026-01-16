@@ -8,3 +8,6 @@ survival_rate
 wait_times
 lib
 log
+.clj-kondo
+.lsp
+.opencode
