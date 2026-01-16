@@ -1,6 +1,6 @@
 #include "../headers/particle.h"
 
-bool particle_does_lap(particle& p, float length) {
+bool particle_does_lap(particle p, float length) {
   return p.state == particle_state::ALIVE 
          && p.velocity*(p.lifespan - p.wait) >= 2*length;
 }
@@ -22,5 +22,5 @@ float lap_time(particle p, float length) {
 }
 
 float next_lap_elapsed(particle p, float length) {
-  return p.elapsed_time + lap_time(p, length);
+  return p.elapsed_time + p.wait + lap_time(p, length);
 }

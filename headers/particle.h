@@ -16,7 +16,7 @@ struct particle {
   float wait = 0.f;
 };
 
-bool particle_does_lap(particle& p, float length);
+bool particle_does_lap(particle p, float length);
 std::string particle_string(particle p);
 float lap_time(particle p, float length);
 float next_lap_elapsed(particle p, float length);

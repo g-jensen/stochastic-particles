@@ -8,7 +8,7 @@ std::string gate_to_string(gate g) {
 }
 
 bool particle_passes_gate(particle p, gate g, float length) {
-  float t = next_lap_elapsed(p,length) + p.wait;
+  float t = next_lap_elapsed(p,length);
   float m = mod(t,g.t1+g.t2);
   bool b = (0 <= m && m < g.t1);
   return g.starting_state ? !b : b;
