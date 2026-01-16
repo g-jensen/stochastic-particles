@@ -35,5 +35,3 @@ std::vector<float> simulate(
   uint particle_count,
   std::function<float(float)> death_distribution_fn,
   reset_config reset_config);
-
-void print(float velocity, std::function<std::vector<float>(float)> simulate_fn);

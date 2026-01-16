@@ -1,6 +1,7 @@
 #include "../headers/gate.h"
 #include "../headers/cli.h"
 #include "../headers/rand.h"
+#include "../headers/io.h"
 
 int main(int argc, char* argv[]) {
   int seed = arg_int(argc, argv, "-s", -1);
@@ -23,14 +24,18 @@ int main(int argc, char* argv[]) {
 
   auto reset_particle_fn = [&] (simulation* sim, particle p) {return reset_particle(sim,p,length);};
 
-  auto simulate_fn = [&](float velocity, float initial_wait) {
-    return simulate(velocity,initial_wait,particle_count,death_distribution_fn,reset_config(should_reset_fn,reset_particle_fn));
-  };
+  simulation sim(death_distribution_fn,particle_count,velocity);
+  sim.init(initial_wait);
+  std::vector<float> rates = survival_rates(&sim,reset_config(should_reset_fn,reset_particle_fn));
 
-  auto print_fn = [&](float velocity, float initial_wait) {
-    print(velocity,initial_wait,simulate_fn);
-  };
-
-  std::cout << "Resets with mean lifespan " << mean_lifespan << ", gate " << gate_to_string(g) << ", and velocity v:" << std::endl;
-  print_fn(velocity, initial_wait);
+  std::cout << "{"
+            << "\"velocity\": " << velocity << ", "
+            << "\"mean_lifespan\": " << mean_lifespan << ", "
+            << "\"initial_wait\": " << initial_wait << ", "
+            << "\"gate_starting_state\": " << (starting_state ? "true" : "false") << ", "
+            << "\"gate_t1\": " << t1 << ", "
+            << "\"gate_t2\": " << t2 << ", "
+            << "\"expected_resets\": " << expected_resets(rates) << ", "
+            << "\"distribution\": " << json_array(rates)
+            << "}" << std::endl;
 }

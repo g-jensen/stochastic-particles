@@ -15,12 +15,14 @@ int main(int argc, char* argv[]) {
   auto should_reset_fn = [&](particle p){return particle_does_lap(p,length);};
   auto reset_particle_fn = [&] (simulation* sim, particle p) {return reset_particle(sim,p,length);};
 
-  auto simulate_fn = [&](float velocity) {
-    return simulate(velocity,0,particle_count,death_distribution_fn,reset_config(should_reset_fn,reset_particle_fn));
-  };
+  simulation sim(death_distribution_fn,particle_count,velocity);
+  sim.init(0);
+  std::vector<float> rates = survival_rates(&sim,reset_config(should_reset_fn,reset_particle_fn));
 
-  auto print_fn = [&](float velocity) {print(velocity,simulate_fn);};
-
-  std::cout << "Resets with mean lifespan " << mean_lifespan <<  " and velocity v:" << std::endl;
-  print_fn(velocity);
+  std::cout << "{"
+            << "\"velocity\": " << velocity << ", "
+            << "\"mean_lifespan\": " << mean_lifespan << ", "
+            << "\"expected_resets\": " << expected_resets(rates) << ", "
+            << "\"distribution\": " << json_array(rates)
+            << "}" << std::endl;
 }

@@ -17,5 +17,3 @@ struct gate {
 
 std::string gate_to_string(gate g);
 bool particle_passes_gate(particle p, gate g, float length);
-
-void print(float velocity, float initial_wait, std::function<std::vector<float>(float,float)> simulate_fn);

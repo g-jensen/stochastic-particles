@@ -34,17 +34,6 @@ particle reset_particle(simulation* sim, particle p, float length, std::function
   return p1;
 }
 
-std::vector<float> simulate(
-  float velocity,
-  std::function<float(particle)> wait_time_fn,
-  uint particle_count,
-  std::function<float(float)> death_distribution_fn,
-  reset_config reset_config) {
-    simulation sim(death_distribution_fn,particle_count,velocity);
-    sim.init(wait_time_fn);
-    return survival_rates(&sim,reset_config);
-}
-
 int main(int argc, char* argv[]) {
   int seed = arg_int(argc, argv, "-s", -1);
   seed_random(seed);
@@ -69,12 +58,17 @@ int main(int argc, char* argv[]) {
     return reset_particle(sim,p,length,wait_time_fn);
   };
 
-  auto simulate_fn = [&](float velocity) {
-    return simulate(velocity,wait_time_fn,particle_count,death_distribution_fn,reset_config(should_reset_fn,reset_particle_fn));
-  };
+  simulation sim(death_distribution_fn,particle_count,velocity);
+  sim.init(wait_time_fn);
+  std::vector<float> rates = survival_rates(&sim,reset_config(should_reset_fn,reset_particle_fn));
 
-  auto print_fn = [&](float velocity) {print(velocity,simulate_fn);};
-
-  std::cout << "Resets with mean lifespan " << mean_lifespan << ", gate " << gate_to_string(g) << ", and velocity v:" << std::endl;
-  print_fn(velocity);
+  std::cout << "{"
+            << "\"velocity\": " << velocity << ", "
+            << "\"mean_lifespan\": " << mean_lifespan << ", "
+            << "\"gate_starting_state\": " << (starting_state ? "true" : "false") << ", "
+            << "\"gate_t1\": " << t1 << ", "
+            << "\"gate_t2\": " << t2 << ", "
+            << "\"expected_resets\": " << expected_resets(rates) << ", "
+            << "\"distribution\": " << json_array(rates)
+            << "}" << std::endl;
 }
