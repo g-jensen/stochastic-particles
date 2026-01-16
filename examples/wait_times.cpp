@@ -5,9 +5,11 @@
 #include "../headers/io.h"
 #include "../headers/reset.h"
 #include "../headers/gate.h"
+#include "../headers/cli.h"
 
 bool is_lifespan_during_gate_on(particle p, gate g) {
-  bool b = mod(p.lifespan,g.t1+g.t2) <= g.t2;
+  float m = mod(p.lifespan,g.t1+g.t2);
+  bool b = (0 < m && m <= g.t1);
   return g.starting_state ? b : !b;
 }
 
@@ -42,11 +44,15 @@ std::vector<float> simulate(
     return survival_rates(&sim,reset_config);
 }
 
-int main() {
-  float mean_lifespan = 2.f;
+int main(int argc, char* argv[]) {
+  float velocity = arg_float(argc, argv, "-v", 1.f);
+  float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);
+  float t1 = arg_float(argc, argv, "-t1", 1.f);
+  float t2 = arg_float(argc, argv, "-t2", 1.f);
+  bool starting_state = arg_int(argc, argv, "-gs", 0) != 0;
   float length = 1.f;
   int particle_count = 1000000;
-  gate g = {.starting_state=0,.t1=1.f,.t2=1.f};
+  gate g = {.starting_state=starting_state,.t1=t1,.t2=t2};
 
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
 
@@ -67,5 +73,5 @@ int main() {
   auto print_fn = [&](float velocity) {print(velocity,simulate_fn);};
 
   std::cout << "Resets with mean lifespan " << mean_lifespan << ", gate " << gate_to_string(g) << ", and velocity v:" << std::endl;
-  print_fn(1.f);
+  print_fn(velocity);
 }
