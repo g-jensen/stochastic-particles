@@ -62,13 +62,13 @@ int main(int argc, char* argv[]) {
   sim.init(wait_time_fn);
   std::vector<float> rates = survival_rates(&sim,reset_config(should_reset_fn,reset_particle_fn));
 
-  std::cout << "{"
-            << "\"velocity\": " << velocity << ", "
-            << "\"mean_lifespan\": " << mean_lifespan << ", "
-            << "\"gate_starting_state\": " << (starting_state ? "true" : "false") << ", "
-            << "\"gate_t1\": " << t1 << ", "
-            << "\"gate_t2\": " << t2 << ", "
-            << "\"expected_resets\": " << expected_resets(rates) << ", "
-            << "\"distribution\": " << json_array(rates)
+  std::cout << "{\n"
+            << "  \"velocity\": " << velocity << ",\n"
+            << "  \"mean_lifespan\": " << mean_lifespan << ",\n"
+            << "  \"gate_starting_state\": " << (starting_state ? "true" : "false") << ",\n"
+            << "  \"gate_t1\": " << t1 << ",\n"
+            << "  \"gate_t2\": " << t2 << ",\n"
+            << "  \"expected_resets\": " << expected_resets(rates) << ",\n"
+            << "  \"distribution\": " << json_array(rates) << "\n"
             << "}" << std::endl;
 }
