@@ -1,10 +1,16 @@
 #include "../headers/gate.h"
+#include "../headers/cli.h"
 
-int main() {
-  float mean_lifespan = 2.f;
+int main(int argc, char* argv[]) {
+  float velocity = arg_float(argc, argv, "-v", 1.f);
+  float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);
+  float initial_wait = arg_float(argc, argv, "-w", 0.f);
+  float t1 = arg_float(argc, argv, "-t1", 1.f);
+  float t2 = arg_float(argc, argv, "-t2", 1.f);
+  bool starting_state = arg_int(argc, argv, "-gs", 0) != 0;
   float length = 1.f;
   int particle_count = 1000000;
-  gate g = {.starting_state=0,.t1=1.f,.t2=1.f};
+  gate g = {.starting_state=starting_state,.t1=t1,.t2=t2};
 
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   
@@ -23,7 +29,5 @@ int main() {
   };
 
   std::cout << "Resets with mean lifespan " << mean_lifespan << ", gate " << gate_to_string(g) << ", and velocity v:" << std::endl;
-  for (float wait = 0.f; wait <= 15.f; wait+=0.1f) {
-    print_fn(1.f,wait);
-  }
+  print_fn(velocity, initial_wait);
 }
