@@ -6,6 +6,7 @@
 #include "../headers/reset.h"
 #include "../headers/gate.h"
 #include "../headers/cli.h"
+#include "../headers/rand.h"
 
 bool is_lifespan_during_gate_on(particle p, gate g) {
   float m = mod(p.lifespan,g.t1+g.t2);
@@ -45,6 +46,8 @@ std::vector<float> simulate(
 }
 
 int main(int argc, char* argv[]) {
+  int seed = arg_int(argc, argv, "-s", -1);
+  seed_random(seed);
   float velocity = arg_float(argc, argv, "-v", 1.f);
   float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);
   float t1 = arg_float(argc, argv, "-t1", 1.f);
