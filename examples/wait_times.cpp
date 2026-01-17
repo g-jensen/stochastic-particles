@@ -36,7 +36,7 @@ particle reset_particle(simulation* sim, particle p, float length, std::function
 
 int main(int argc, char* argv[]) {
   int seed = arg_int(argc, argv, "-s", -1);
-  seed_random(seed);
+  seed_random(&seed);
   float velocity = arg_float(argc, argv, "-v", 1.f);
   float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);
   float t1 = arg_float(argc, argv, "-t1", 1.f);
@@ -69,6 +69,7 @@ int main(int argc, char* argv[]) {
             << "  \"gate_t1\": " << t1 << ",\n"
             << "  \"gate_t2\": " << t2 << ",\n"
             << "  \"expected_resets\": " << expected_resets(rates) << ",\n"
-            << "  \"distribution\": " << json_array(rates) << "\n"
+            << "  \"distribution\": " << json_array(rates) << ",\n"
+            << "  \"seed\": " << seed << "\n"
             << "}" << std::endl;
 }

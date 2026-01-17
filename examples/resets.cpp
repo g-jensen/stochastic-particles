@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]) {
   int seed = arg_int(argc, argv, "-s", -1);
-  seed_random(seed);
+  seed_random(&seed);
   float velocity = arg_float(argc, argv, "-v", 1.f);
   float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);
   float length = 1.f;

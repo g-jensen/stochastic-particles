@@ -4,12 +4,11 @@ std::uniform_real_distribution<> dis(0.0, 1.0);
 std::random_device rd;
 std::mt19937 gen(rd());
 
-void seed_random(int seed) {
-  if (seed < 0) {
-    gen.seed(rd());
-  } else {
-    gen.seed(seed);
+void seed_random(int* seed) {
+  if (*seed < 0) {
+    *seed = rd();
   }
+  gen.seed(*seed);
 }
 
 float random_probability() {
