@@ -2,35 +2,45 @@ SRC_DIR = src
 SPEC_DIR = spec
 LIB_DIR = lib
 DEPS_LOG = log/deps.log
+OUTDIR = build
+OBJ_DIR = $(OUTDIR)/obj
+
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
 all: mean survival_rate resets gates wait_times
 
-.PHONY: src
-src: src/* headers/*
-	g++ -c src/*
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OUTDIR):
+	mkdir -p $(OUTDIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	g++ -c $< -o $@
 
 .PHONY: mean
-mean: src
-	g++ -o mean examples/mean.cpp *.o
+mean: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/mean examples/mean.cpp $(OBJS)
 
 .PHONY: resets
-resets: src
-	g++ -o resets examples/resets.cpp *.o
+resets: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/resets examples/resets.cpp $(OBJS)
 
 .PHONY: survival_rate
-survival_rate: src
-	g++ -o survival_rate examples/survival_rate.cpp *.o
+survival_rate: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/survival_rate examples/survival_rate.cpp $(OBJS)
 
 .PHONY: gates
-gates: src
-	g++ -o gates examples/gates.cpp *.o
+gates: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/gates examples/gates.cpp $(OBJS)
 
 .PHONY: wait_times
-wait_times: src
-	g++ -o wait_times examples/wait_times.cpp *.o
+wait_times: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/wait_times examples/wait_times.cpp $(OBJS)
 
 clean:
-	rm -f *.o
+	rm -rf $(OUTDIR)
 
 $(DEPS_LOG):
 	@mkdir -p log

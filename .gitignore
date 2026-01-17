@@ -10,3 +10,4 @@ lib
 log
 .clj-kondo
 .lsp
+build
