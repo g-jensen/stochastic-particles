@@ -25,7 +25,8 @@ float wait_time(particle p, gate g, float length) {
   } else {
     dt = gate_offset(g) + (floor(p.lifespan / (g.t1+g.t2)) * (g.t1+g.t2)) - ((2*length) / p.velocity);
   }
-  return std::max(0.f,dt - mod(p.elapsed_time,g.t1+g.t2));
+  float offset = mod(p.elapsed_time,g.t1+g.t2);
+  return std::max(0.f,dt - offset);
 }
 
 particle reset_particle(simulation* sim, particle p, float length, std::function<float(particle)> wait_time_fn) {
