@@ -14,6 +14,7 @@
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
 \newcommand{\numLaps}{\text{\# of laps}}
+\newcommand{\modx}{ \ \text{mod} \ }
 
 \title{Particle Survival}
 \author{}
@@ -124,7 +125,7 @@ Thus,
 so $E(\text{\# of resets})$ becomes arbitrarily close to the line $\frac{1}{2\lambda}v-\frac{1}{2}$ as $v$ approaches infinity.
 
 \subsection{Gates and Wait Times}
-Now imagine $x=0$ as a sort of gate that turns on and off periodically. If the particle reaches $x=0$ when the gate is on, then the particle is allowed to reset and keep going. If the particle reaches $x=0$ when the gate is off, it dies. Specifically, the gate is on for $[0,T_1)$ and then off for $[T_1,T_1+T_2)$ and repeats this pattern indefinitely. Based on its velocity, the particle may unluckily become out-of-sync with the gate and frequently die, so we give it the ability to wait. Waiting still drains the life of the particle, but it can wait for an amount of time to try make sure that it reaches $x=0$ when the gates is on. The particle can wait different times based on the lifespan it was given after each lap.
+Now imagine $x=0$ as a sort of gate that turns on and off periodically. If the particle reaches $x=0$ when the gate is on, then the particle is allowed to reset and keep going. If the particle reaches $x=0$ when the gate is off, it dies. Specifically, the gate is on for $(0,T_1]$ and then off for $(T_1,T_1+T_2]$ and repeats this pattern indefinitely. Based on its velocity, the particle may unluckily become out-of-sync with the gate and frequently die, so we give it the ability to wait. Waiting still drains the life of the particle, but it can wait for an amount of time to try make sure that it reaches $x=0$ when the gates is on. The particle can wait different times based on the lifespan it was given after each lap.
 \\
 \\
 The question now becomes: what is the optimal wait time during a given lap? Optimal meaning that the strategy that yields the highest expected number of resets.
@@ -133,17 +134,26 @@ The question now becomes: what is the optimal wait time during a given lap? Opti
 The particle can wait at any period during the lap, but it is equivalent if it only waits at the beginning of a lap.
 \\
 \\
-By simplifying to a scenario starting at $t=0$, I've calculated that if the gate starts on, then
+By simplifying to a scenario starting at $t=0$, I've calculated that if the gate starts in the on state, then
 \[
 \Delta t = \begin{cases}
-  l - \frac{2}{v}, & l \mod T_1+T_2 \leq T_1\\
-  T_1+\lfloor \frac{l}{T_1+T_2}\rfloor(T_1+T_2)-\frac{2}{v}, & l \mod T_1+T_2 > T_1
+  l - \frac{2}{v}, & l \modx (T_1+T_2) \leq T_1\\
+  T_1+\lfloor \frac{l}{T_1+T_2}\rfloor(T_1+T_2)-\frac{2}{v}, & l \modx (T_1+T_2) > T_1
 \end{cases}
 \]
 is the furthest point that the particle can start from and still live. Since every lap starts at some offset during an interval when the gate is on, say $\Omega$. Then we have the following equation regard the wait time during a lap:
 \[
 w + \Omega = \Delta t \implies w= \Delta t - \Omega.
 \]
+And if the gate starts in the off state, then the cases are swapped with some slight adjustment:
+\[
+\Delta t = \begin{cases}
+  l - \frac{2}{v}, & l \modx (T_1+T_2) > T_1\\
+  \lfloor \frac{l}{T_1+T_2}\rfloor(T_1+T_2)-\frac{2}{v}, & l \modx (T_1+T_2) \leq T_1
+\end{cases}
+\]
+It is possible that $w<0$ implying that the particle will not be able to complete the lap.\\
+So, perhaps more formally, $w=\max(\Delta t - \Omega,0)$.
 \bibliographystyle{alpha}
 \bibliography{sample}
 
