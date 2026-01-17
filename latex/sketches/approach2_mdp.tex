@@ -1,0 +1,219 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\modx}{ \ \text{mod} \ }
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+\title{Approach 2: Markov Decision Process Formulation}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Setup}
+
+We model the particle's decision problem as a Markov Decision Process.
+
+\begin{definition}[State Space]
+The state at the beginning of a lap is $(\Omega, l)$ where:
+\begin{itemize}
+    \item $\Omega \in (0, T_1]$ is the particle's position in the gate cycle (time since last OFF$\to$ON transition, modulo the period $T_1 + T_2$). Since laps only begin when the gate is ON, we have $\Omega \in (0, T_1]$.
+    \item $l \in [0, \infty)$ is the particle's lifespan for this lap.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Action Space]
+Given state $(\Omega, l)$, the particle chooses a wait time $w \geq 0$. The particle then:
+\begin{enumerate}
+    \item Waits for time $w$
+    \item Travels for time $\tau := 2/v$ (the lap time)
+    \item Arrives at the gate at cycle time $(\Omega + w + \tau) \modx (T_1 + T_2)$
+\end{enumerate}
+The action is \emph{feasible} if $w + \tau \leq l$ (particle survives long enough).
+\end{definition}
+
+\begin{definition}[Transition and Reward]
+If the particle arrives when the gate is ON (arrival time mod period is in $(0, T_1]$):
+\begin{itemize}
+    \item Reward: $+1$ (one lap completed)
+    \item Transition: New state $(\Omega', l')$ where $\Omega' = (\Omega + w + \tau) \modx (T_1 + T_2)$ and $l' \sim \text{Exp}(\lambda)$ independent of history.
+\end{itemize}
+If the particle arrives when the gate is OFF, or if the action is infeasible:
+\begin{itemize}
+    \item Reward: $0$
+    \item Transition: Terminal state (particle dies)
+\end{itemize}
+\end{definition}
+
+\section{Value Function}
+
+\begin{definition}[Value Function]
+Let $V(\Omega, l)$ denote the expected total future laps starting from state $(\Omega, l)$ under an optimal policy.
+\end{definition}
+
+\begin{lemma}[Structure of $V$]
+The value function satisfies the Bellman equation:
+\[
+V(\Omega, l) = \max_{w \in A(\Omega, l)} \left\{ 1 + \E_{l' \sim \text{Exp}(\lambda)}[V(\Omega', l')] \right\}
+\]
+where $A(\Omega, l)$ is the set of feasible wait times that result in arrival during an ON window, and $\Omega' = (\Omega + w + \tau) \modx (T_1 + T_2)$.
+
+If $A(\Omega, l) = \emptyset$, then $V(\Omega, l) = 0$.
+\end{lemma}
+
+\section{Key Observation: Separability}
+
+\begin{lemma}[Future Value Depends Only on $\Omega'$]
+\label{lem:separability}
+By the memorylessness of the exponential distribution, the expected future value after a successful lap depends only on the new cycle position $\Omega'$:
+\[
+\E_{l' \sim \text{Exp}(\lambda)}[V(\Omega', l')] =: U(\Omega')
+\]
+where $U: (0, T_1] \to \R$ is some function independent of the current lifespan $l$.
+\end{lemma}
+
+This is crucial: the future doesn't care how we got to $\Omega'$, only that we're there.
+
+\section{Characterizing the Optimal Policy}
+
+Given Lemma \ref{lem:separability}, the Bellman equation becomes:
+\[
+V(\Omega, l) = \max_{w \in A(\Omega, l)} \left\{ 1 + U(\Omega') \right\}
+\]
+
+Since the reward $1$ is constant for any successful lap, maximizing $V$ is equivalent to maximizing $U(\Omega')$.
+
+\begin{lemma}[$U$ is Decreasing]
+\label{lem:U_decreasing}
+$U(\Omega)$ is non-increasing in $\Omega$. That is, starting closer to the end of the ON window (larger $\Omega$, hence closer to $T_1$) yields at least as high expected future laps.
+\end{lemma}
+
+\begin{proof}[Proof Sketch]
+Intuitively: larger $\Omega$ means the next OFF period starts sooner, but more importantly, after the OFF period, the next ON period is closer in absolute time. Specifically, the time until the next ON window starts is:
+\[
+\text{Time to next ON} = (T_1 - \Omega) + T_2 = T_1 + T_2 - \Omega
+\]
+This is decreasing in $\Omega$. A particle starting with larger $\Omega$ has the next ON window closer, so it can reach it with a shorter lifespan.
+
+More formally, consider two starting positions $\Omega_1 < \Omega_2$. For any lifespan $l$, if a particle starting at $\Omega_2$ can successfully complete a lap, then a particle starting at $\Omega_1$ can also complete a lap (possibly arriving at a different point in the ON window). But the particle at $\Omega_2$ arrives at a better position for the \emph{next} lap.
+
+Actually, this requires more care. Let me reconsider...
+
+The key is that $U(\Omega)$ satisfies its own fixed-point equation:
+\[
+U(\Omega) = \E_{l \sim \text{Exp}(\lambda)}[V(\Omega, l)]
+\]
+and $V(\Omega, l) = 0$ if no ON window is reachable, otherwise $V(\Omega, l) = 1 + U(\Omega^*)$ where $\Omega^*$ is the optimal arrival position.
+
+If the optimal policy is to arrive as late as possible (at $\Omega' = T_1$), then $U(\Omega)$ is the probability of reaching the end of the current ON window times $(1 + U(T_1))$:
+\[
+U(\Omega) = P(l \geq T_1 - \Omega + \tau) \cdot (1 + U(T_1))
+\]
+Wait, this assumes we can only target the current window. We might also be able to wait and reach a future ON window...
+\end{proof}
+
+\section{Refined Analysis: Reachable ON Windows}
+
+Given state $(\Omega, l)$, which ON windows can the particle reach?
+
+The particle starts at cycle time $\Omega$. After waiting $w$ and traveling $\tau$, it arrives at cycle time:
+\[
+\Omega + w + \tau \modx (T_1 + T_2)
+\]
+
+For this to be in $(0, T_1]$, we need:
+\[
+\Omega + w + \tau \in \bigcup_{k=0}^{\infty} (k(T_1+T_2), k(T_1+T_2) + T_1]
+\]
+
+The $k$-th ON window is reachable if:
+\begin{align}
+k(T_1+T_2) < \Omega + w + \tau &\leq k(T_1+T_2) + T_1 \\
+w + \tau &\leq l \quad \text{(feasibility)}
+\end{align}
+
+For $k = 0$ (current ON window): need $\Omega + w + \tau \leq T_1$, i.e., $w \leq T_1 - \Omega - \tau$.
+
+For $k \geq 1$ (future ON windows): need $w + \tau > k(T_1+T_2) - \Omega$ and $w + \tau \leq k(T_1+T_2) + T_1 - \Omega$.
+
+\begin{lemma}[Latest Reachable Point]
+Given lifespan $l$ and current position $\Omega$, the latest point in any ON window that the particle can reach is:
+\[
+\Omega^* = \min((\Omega + l - \tau) \modx (T_1+T_2), T_1)
+\]
+if $(\Omega + l - \tau) \modx (T_1+T_2) \in (0, T_1]$, otherwise we target the end of the previous feasible ON window.
+
+This matches the $\Delta t$ formula in the paper when translated appropriately.
+\end{lemma}
+
+\section{Proving Optimality}
+
+\begin{theorem}[Optimality of Latest-Arrival Strategy]
+The policy that always arrives as late as possible within the latest reachable ON window is optimal.
+\end{theorem}
+
+\begin{proof}
+By Lemma \ref{lem:separability}, the optimal action maximizes $U(\Omega')$ over feasible $\Omega'$.
+
+By Lemma \ref{lem:U_decreasing}, $U$ is maximized at $\Omega' = T_1$ (end of ON window).
+
+Therefore, the optimal policy chooses $w$ to make $\Omega'$ as close to $T_1$ as possible, subject to feasibility.
+
+If the current ON window is reachable (i.e., $T_1 - \Omega - \tau \geq 0$ and $T_1 - \Omega \leq l$), then target $\Omega' = T_1$ in the current window.
+
+If not, find the latest reachable ON window and target its end.
+
+This is precisely what the $\Delta t$ formula computes.
+\end{proof}
+
+\section{Gap: Proving $U$ is Decreasing}
+
+The main gap in this proof is rigorously establishing Lemma \ref{lem:U_decreasing}. 
+
+\subsection{Attempt via Fixed Point}
+
+$U(\Omega)$ satisfies:
+\[
+U(\Omega) = \int_0^\infty \lambda e^{-\lambda l} V(\Omega, l) \, dl
+\]
+
+If the optimal policy is to target $\Omega' = T_1$ whenever possible, then:
+\[
+V(\Omega, l) = \begin{cases}
+1 + U(T_1) & \text{if } l \geq \tau + (T_1 - \Omega)^+ \text{ and can reach } T_1 \\
+0 & \text{otherwise}
+\end{cases}
+\]
+
+Wait, this is circular. Let me think differently...
+
+\subsection{Attempt via Coupling}
+
+Consider two particles starting at $\Omega_1 < \Omega_2$ with the same sequence of lifespans $l_1, l_2, l_3, \ldots$
+
+Claim: If particle 2 (starting at $\Omega_2$) survives $n$ laps, then particle 1 (starting at $\Omega_1$) also survives at least $n$ laps.
+
+Hmm, this isn't obviously true because particle 1 might end up in a worse position after its first lap...
+
+Actually, I think the right coupling is more subtle. Let me reconsider in Approach 3.
+
+\section{Conclusion}
+
+The MDP formulation clarifies the structure:
+\begin{enumerate}
+    \item Future value depends only on $\Omega'$ (memorylessness)
+    \item Optimal policy maximizes $U(\Omega')$
+    \item If $U$ is decreasing, then targeting $\Omega' = T_1$ is optimal
+\end{enumerate}
+
+The gap is proving $U$ is decreasing, which may be easier via a coupling argument.
+
+\end{document}

@@ -1,0 +1,96 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\newcommand{\modx}{ \ \text{mod} \ }
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+\title{Approach 1: Upper Bound Method}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Goal}
+Compute an upper bound on $\E[\text{\# of laps}]$ for any strategy, then show our wait-time strategy achieves it.
+
+\section{Setup}
+\begin{itemize}
+    \item Particle has velocity $v > 0$, lap time $\tau = 2/v$
+    \item Lifespan $l \sim \text{Exp}(\lambda)$, i.e., $\Prob(l > t) = e^{-\lambda t}$
+    \item Gate ON during $(0, T_1]$, OFF during $(T_1, T_1+T_2]$, period $T = T_1 + T_2$
+    \item Strategy: function $w(l, \Omega)$ giving wait time based on lifespan and current offset
+\end{itemize}
+
+\section{Attempt 1: Naive Upper Bound}
+
+The simplest upper bound ignores the gate entirely. Without a gate, survival probability per lap is:
+\[
+S_0 = \Prob(l \geq \tau) = e^{-\lambda \tau}
+\]
+giving expected laps:
+\[
+\E[\text{\# of laps}] \leq \frac{S_0}{1 - S_0} = \frac{e^{-\lambda \tau}}{1 - e^{-\lambda \tau}} = \frac{1}{e^{\lambda \tau} - 1}
+\]
+
+This bound is too loose --- it doesn't account for the gate at all.
+
+\section{Attempt 2: Gate-Aware Upper Bound}
+
+For a particle to complete a lap, it must:
+\begin{enumerate}
+    \item Have lifespan $l \geq w + \tau$ (survive the wait plus travel)
+    \item Arrive when gate is ON
+\end{enumerate}
+
+\textbf{Key observation:} The best possible scenario is when the particle can always reach an ON window with zero wait. This happens when $\Omega + \tau \leq T_1$ (mod $T$), i.e., the particle naturally arrives during ON.
+
+But even in the best case, the particle needs $l \geq \tau$. So:
+\[
+\E[\text{\# of laps}] \leq \frac{e^{-\lambda \tau}}{1 - e^{-\lambda \tau}}
+\]
+
+This is the same bound! The gate can only hurt, never help.
+
+\section{Attempt 3: Tighter Bound via Conditional Analysis}
+
+Let's condition on the offset $\Omega$ at the start of a lap. Define:
+\[
+S(\Omega) = \Prob(\text{survive lap} \mid \text{start at offset } \Omega)
+\]
+
+For a particle starting at offset $\Omega \in (0, T_1]$:
+\begin{itemize}
+    \item It arrives at time $\Omega + w + \tau$ (mod $T$)
+    \item To arrive in ON window $(0, T_1]$, need $\Omega + w + \tau \in (0, T_1] \pmod{T}$
+    \item Also need $l \geq w + \tau$
+\end{itemize}
+
+The optimal $w$ maximizes survival probability. But here's the key insight: the particle knows $l$ before choosing $w$. So it can always choose $w$ to land in an ON window if possible.
+
+\textbf{When is it possible?} The particle can reach the $k$-th ON window if:
+\[
+l \geq w_k + \tau
+\]
+where $w_k$ is the wait needed to reach that window. The latest reachable ON window gives the optimal positioning.
+
+\section{Difficulty with Upper Bound Approach}
+
+The challenge is that the upper bound approach doesn't naturally capture the \emph{adaptive} nature of the strategy. The particle chooses $w$ based on $l$, which creates correlation between survival events across laps.
+
+To get a tight upper bound, we'd need to show that no strategy can do better than some value $V^*$, then show our strategy achieves $V^*$. But characterizing $V^*$ directly seems as hard as solving the optimization problem.
+
+\section{Conclusion}
+
+The upper bound approach doesn't seem to yield a clean proof. The naive bounds are too loose, and tighter bounds require essentially solving the full optimization problem.
+
+\textbf{Key insight gained:} The problem has a recursive structure --- the value of being at offset $\Omega$ depends on expected future value, which depends on the distribution of future offsets. This suggests the MDP approach (Approach 2) may be more natural.
+
+\end{document}
