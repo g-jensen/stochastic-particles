@@ -39,6 +39,10 @@ gates: $(OBJS) | $(OUTDIR)
 wait_times: $(OBJS) | $(OUTDIR)
 	g++ -o $(OUTDIR)/wait_times examples/wait_times.cpp $(OBJS)
 
+.PHONY: latex
+latex:
+	./scripts/compile_paper.sh
+
 clean:
 	rm -rf $(OUTDIR)
 
