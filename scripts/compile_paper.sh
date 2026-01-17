@@ -5,7 +5,7 @@ OUTPUT_DIR="build/latex"
 
 
 compile() {
-  latexmk -output-directory=$OUTPUT_DIR -aux-directory=$OUTPUT_DIR $TEX_FILE 
+  latexmk -output-directory=$OUTPUT_DIR -aux-directory=$OUTPUT_DIR -silent $TEX_FILE 
 }
 
 watch() {
