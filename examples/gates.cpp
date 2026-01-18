@@ -36,6 +36,7 @@ int main(int argc, char* argv[]) {
             << "  \"gate_t1\": " << t1 << ",\n"
             << "  \"gate_t2\": " << t2 << ",\n"
             << "  \"expected_resets\": " << expected_resets(rates) << ",\n"
-            << "  \"distribution\": " << json_array(rates) << "\n"
+            << "  \"distribution\": " << json_array(rates) << ",\n"
+            << "  \"seed\": " << seed << "\n"
             << "}" << std::endl;
 }

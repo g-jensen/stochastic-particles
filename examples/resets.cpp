@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
             << "  \"velocity\": " << velocity << ",\n"
             << "  \"mean_lifespan\": " << mean_lifespan << ",\n"
             << "  \"expected_resets\": " << expected_resets(rates) << ",\n"
-            << "  \"distribution\": " << json_array(rates) << "\n"
+            << "  \"distribution\": " << json_array(rates) << ",\n"
+            << "  \"seed\": " << seed << "\n"
             << "}" << std::endl;
 }
