@@ -8,7 +8,7 @@ OBJ_DIR = $(OUTDIR)/obj
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
-all: mean survival_rate resets gates late_wait_time early_wait_time
+all: mean survival_rate laps max_wait_laps gates late_wait_time early_wait_time threshold_wait_time
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
@@ -23,9 +23,13 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 mean: $(OBJS) | $(OUTDIR)
 	g++ -o $(OUTDIR)/mean examples/mean.cpp $(OBJS)
 
-.PHONY: resets
-resets: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/resets examples/resets.cpp $(OBJS)
+.PHONY: laps
+laps: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/laps examples/laps.cpp $(OBJS)
+
+.PHONY: max_wait_laps
+max_wait_laps: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/max_wait_laps examples/max_wait_laps.cpp $(OBJS)
 
 .PHONY: survival_rate
 survival_rate: $(OBJS) | $(OUTDIR)
@@ -42,6 +46,10 @@ late_wait_time: $(OBJS) | $(OUTDIR)
 .PHONY: early_wait_time
 early_wait_time: $(OBJS) | $(OUTDIR)
 	g++ -o $(OUTDIR)/early_wait_time examples/early_wait_time.cpp $(OBJS)
+
+.PHONY: threshold_wait_time
+threshold_wait_time: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/threshold_wait_time examples/threshold_wait_time.cpp $(OBJS)
 
 .PHONY: latex
 latex:
