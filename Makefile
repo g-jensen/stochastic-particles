@@ -8,7 +8,7 @@ OBJ_DIR = $(OUTDIR)/obj
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
-all: mean survival_rate resets gates wait_times
+all: mean survival_rate resets gates late_wait_time early_wait_time
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
@@ -35,9 +35,13 @@ survival_rate: $(OBJS) | $(OUTDIR)
 gates: $(OBJS) | $(OUTDIR)
 	g++ -o $(OUTDIR)/gates examples/gates.cpp $(OBJS)
 
-.PHONY: wait_times
-wait_times: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/wait_times examples/wait_times.cpp $(OBJS)
+.PHONY: late_wait_time
+late_wait_time: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/late_wait_time examples/late_wait_time.cpp $(OBJS)
+
+.PHONY: early_wait_time
+early_wait_time: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/early_wait_time examples/early_wait_time.cpp $(OBJS)
 
 .PHONY: latex
 latex:
