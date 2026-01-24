@@ -1,10 +1,10 @@
 #!/bin/bash
 
-echo "=== resets ==="
+echo "=== resets (upper bound) ==="
 ./build/resets "$@"
 echo ""
-echo "=== gates ==="
-./build/gates "$@"
+echo "=== late_wait_time ==="
+./build/late_wait_time "$@"
 echo ""
-echo "=== wait_times ==="
-./build/wait_times "$@"
+echo "=== early_wait_time ==="
+./build/early_wait_time "$@"

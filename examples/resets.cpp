@@ -8,8 +8,8 @@ int main(int argc, char* argv[]) {
   seed_random(&seed);
   float velocity = arg_float(argc, argv, "-v", 1.f);
   float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);
+  int particle_count = arg_int(argc, argv, "-n", 100000);
   float length = 1.f;
-  int particle_count = 1000000;
 
   auto death_distribution_fn = [&](float rand) {return exponential_distribution(rand,mean_lifespan);};
   auto should_reset_fn = [&](particle p){return particle_does_lap(p,length);};
@@ -20,9 +20,13 @@ int main(int argc, char* argv[]) {
   std::vector<float> rates = survival_rates(&sim,reset_config(should_reset_fn,reset_particle_fn));
 
   std::cout << "{\n"
+            << "  \"strategy\": \"none (upper bound)\",\n"
             << "  \"velocity\": " << velocity << ",\n"
+            << "  \"tau\": " << (2 * length / velocity) << ",\n"
             << "  \"mean_lifespan\": " << mean_lifespan << ",\n"
-            << "  \"expected_resets\": " << expected_resets(rates) << ",\n"
+            << "  \"lambda\": " << (1.0 / mean_lifespan) << ",\n"
+            << "  \"particle_count\": " << particle_count << ",\n"
+            << "  \"expected_laps\": " << expected_resets(rates) << ",\n"
             << "  \"distribution\": " << json_array(rates) << ",\n"
             << "  \"seed\": " << seed << "\n"
             << "}" << std::endl;
