@@ -6,7 +6,7 @@
 #include "particle.h"
 #include "math.h"
 #include "simulation.h"
-#include "reset.h"
+#include "lap.h"
 
 // gate that is periodically starting_state for t1 seconds and then !starting_state for t2 seconds.
 struct gate {

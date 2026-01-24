@@ -1,5 +1,5 @@
 #include "../headers/strategy.h"
-#include "../headers/reset.h"
+#include "../headers/lap.h"
 #include "../headers/distribution.h"
 #include "../headers/simulation.h"
 #include "../headers/cli.h"
@@ -59,9 +59,29 @@ float early_wait_time(particle p, gate g, float length) {
   return min_wait;
 }
 
-particle reset_particle_with_wait(simulation* sim, particle p, float length,
-                                   std::function<float(particle)> wait_time_fn) {
-  particle p1 = reset_particle(sim, p, length);
+float threshold_wait_time(particle p, gate g, float length, float threshold) {
+  if (p.lifespan < threshold) {
+    return early_wait_time(p, g, length);
+  } else {
+    float late_wait = late_wait_time(p, g, length);
+    float tau = (2 * length) / p.velocity;
+    if (late_wait + tau <= p.lifespan) {
+      return late_wait;
+    } else {
+      return early_wait_time(p, g, length);
+    }
+  }
+}
+
+wait_strategy make_threshold_strategy(float threshold) {
+  return [threshold](particle p, gate g, float length) {
+    return threshold_wait_time(p, g, length, threshold);
+  };
+}
+
+particle lap_particle_with_wait(simulation* sim, particle p, float length,
+                                 std::function<float(particle)> wait_time_fn) {
+  particle p1 = lap_particle(sim, p, length);
   p1.wait = wait_time_fn(p1);
   return p1;
 }
@@ -72,14 +92,14 @@ value_result estimate_value(float omega, gate g, float velocity, float mean_life
     return exponential_distribution(rand, mean_lifespan);
   };
 
-  auto should_reset_fn = [&](particle p) {
+  auto should_lap_fn = [&](particle p) {
     return particle_does_lap(p, length) && particle_passes_gate(p, g, length);
   };
 
   auto wait_time_fn = [&](particle p) { return strategy(p, g, length); };
 
-  auto reset_particle_fn = [&](simulation* sim, particle p) {
-    return reset_particle_with_wait(sim, p, length, wait_time_fn);
+  auto lap_particle_fn = [&](simulation* sim, particle p) {
+    return lap_particle_with_wait(sim, p, length, wait_time_fn);
   };
 
   simulation sim(death_distribution_fn, particle_count, velocity);
@@ -91,9 +111,16 @@ value_result estimate_value(float omega, gate g, float velocity, float mean_life
     sim.particles.push_back(p);
   }
 
-  std::vector<float> rates = survival_rates(&sim, reset_config(should_reset_fn, reset_particle_fn));
+  std::vector<float> rates = survival_rates(&sim, lap_config(should_lap_fn, lap_particle_fn));
 
-  return {omega, expected_resets(rates), rates};
+  float tau = (2 * length) / velocity;
+  float total_survival = 0;
+  for (const particle& p : sim.particles) {
+    total_survival += p.elapsed_time + std::min(p.lifespan, p.wait + tau);
+  }
+  float avg_survival_time = total_survival / particle_count;
+
+  return {omega, expected_laps(rates), avg_survival_time, rates};
 }
 
 void run_strategy_simulation(int argc, char* argv[], wait_strategy strategy,
@@ -126,6 +153,7 @@ void run_strategy_simulation(int argc, char* argv[], wait_strategy strategy,
             << "  \"particle_count\": " << particle_count << ",\n"
             << "  \"offset\": " << omega << ",\n"
             << "  \"expected_laps\": " << result.expected_laps << ",\n"
+            << "  \"avg_survival_time\": " << result.avg_survival_time << ",\n"
             << "  \"distribution\": " << json_array(result.distribution) << ",\n"
             << "  \"seed\": " << seed << "\n"
             << "}" << std::endl;

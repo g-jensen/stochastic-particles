@@ -13,12 +13,12 @@ for ((i=1; i<=$#; i++)); do
 done
 
 if [[ -z "$seed" ]]; then
-  seed=$RANDOM$RANDOM
+  seed=$((RANDOM % 1000000))
   args+=("-s" "$seed")
 fi
 
-echo "=== resets (upper bound) ==="
-./build/resets "${args[@]}"
+echo "=== max_wait_laps (upper bound) ==="
+./build/max_wait_laps "${args[@]}"
 echo ""
 echo "=== gates (lower bound) ==="
 ./build/gates "${args[@]}"
