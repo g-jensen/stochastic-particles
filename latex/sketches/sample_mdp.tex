@@ -1,0 +1,198 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\newcommand{\E}{\mathbb{E}}
+
+\newtheorem{definition}{Definition}
+
+\title{A Gentle Introduction to MDPs via Example}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{The Problem: A Wandering Forager}
+
+A forager gathers food to survive. Each day, the forager is at one of two locations:
+\begin{itemize}
+    \item \textbf{Meadow}: Safe but low reward
+    \item \textbf{Forest}: Dangerous but high reward
+\end{itemize}
+
+Each day, the forager chooses to \textbf{Stay} or \textbf{Travel}. Based on location and choice:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Location} & \textbf{Action} & \textbf{Food Gained} & \textbf{Survival Prob} \\
+\hline
+Meadow & Stay & 1 & 0.9 \\
+Meadow & Travel & 0 & 0.8 (arrive at Forest) \\
+Forest & Stay & 2 & 0.5 \\
+Forest & Travel & 0 & 0.8 (arrive at Meadow) \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Goal:} Maximize expected total food gathered before death.
+
+\section{Formalizing as an MDP}
+
+\begin{definition}[Markov Decision Process]
+An MDP consists of:
+\begin{itemize}
+    \item \textbf{States} $S$: The possible situations
+    \item \textbf{Actions} $A(s)$: Choices available in each state
+    \item \textbf{Transitions} $P(s' | s, a)$: Probability of moving to state $s'$ given state $s$ and action $a$
+    \item \textbf{Rewards} $R(s, a)$: Immediate payoff for taking action $a$ in state $s$
+\end{itemize}
+\end{definition}
+
+For our forager:
+\begin{itemize}
+    \item $S = \{\text{Meadow}, \text{Forest}, \text{Dead}\}$
+    \item $A(s) = \{\text{Stay}, \text{Travel}\}$ for $s \in \{\text{Meadow}, \text{Forest}\}$
+    \item Dead is a \emph{terminal state} (absorbing, no actions, no rewards)
+\end{itemize}
+
+\section{The Value Function}
+
+\begin{definition}[Value Function]
+$V(s)$ = expected total future reward starting from state $s$, under an optimal policy.
+\end{definition}
+
+The value function tells us ``how good'' each state is. Clearly $V(\text{Dead}) = 0$.
+
+\section{The Bellman Equation}
+
+The key insight: the value of a state equals the best immediate reward plus the expected future value:
+\[
+V(s) = \max_{a \in A(s)} \left\{ R(s,a) + \sum_{s'} P(s'|s,a) \cdot V(s') \right\}
+\]
+
+This is the \textbf{Bellman equation}. It says: pick the action that maximizes (immediate reward + expected continuation value).
+
+\section{Writing the Equations}
+
+Let $V_M = V(\text{Meadow})$ and $V_F = V(\text{Forest})$.
+
+\textbf{In Meadow:}
+\begin{align*}
+\text{Stay:} \quad & 1 + 0.9 \cdot V_M + 0.1 \cdot 0 = 1 + 0.9 V_M \\
+\text{Travel:} \quad & 0 + 0.8 \cdot V_F + 0.2 \cdot 0 = 0.8 V_F
+\end{align*}
+
+\textbf{In Forest:}
+\begin{align*}
+\text{Stay:} \quad & 2 + 0.5 \cdot V_F + 0.5 \cdot 0 = 2 + 0.5 V_F \\
+\text{Travel:} \quad & 0 + 0.8 \cdot V_M + 0.2 \cdot 0 = 0.8 V_M
+\end{align*}
+
+The Bellman equations are:
+\begin{align}
+V_M &= \max\{1 + 0.9 V_M, \; 0.8 V_F\} \label{eq:bellman_M} \\
+V_F &= \max\{2 + 0.5 V_F, \; 0.8 V_M\} \label{eq:bellman_F}
+\end{align}
+
+\section{Solving the Equations}
+
+We don't know which action is optimal in each state, so we try all four policy combinations.
+
+\subsection{Attempt 1: Stay in both}
+
+Assume Stay is optimal in both states:
+\begin{align*}
+V_M &= 1 + 0.9 V_M \implies V_M = 10 \\
+V_F &= 2 + 0.5 V_F \implies V_F = 4
+\end{align*}
+
+\textbf{Check consistency:}
+\begin{itemize}
+    \item In Meadow: Stay gives $1 + 0.9(10) = 10$, Travel gives $0.8(4) = 3.2$. Stay is better. \checkmark
+    \item In Forest: Stay gives $2 + 0.5(4) = 4$, Travel gives $0.8(10) = 8$. Travel is better! \textbf{Contradiction.}
+\end{itemize}
+
+This policy is \emph{not} optimal.
+
+\subsection{Attempt 2: Stay in Meadow, Travel in Forest}
+
+\begin{align*}
+V_M &= 1 + 0.9 V_M \implies V_M = 10 \\
+V_F &= 0.8 V_M = 0.8(10) = 8
+\end{align*}
+
+\textbf{Check consistency:}
+\begin{itemize}
+    \item In Meadow: Stay gives $1 + 0.9(10) = 10$, Travel gives $0.8(8) = 6.4$. Stay is better. \checkmark
+    \item In Forest: Stay gives $2 + 0.5(8) = 6$, Travel gives $0.8(10) = 8$. Travel is better. \checkmark
+\end{itemize}
+
+\textbf{This is the optimal policy!}
+
+\subsection{Verification of other cases (for completeness)}
+
+\textbf{Attempt 3: Travel in Meadow, Stay in Forest}
+\begin{align*}
+V_M &= 0.8 V_F \\
+V_F &= 2 + 0.5 V_F \implies V_F = 4 \implies V_M = 3.2
+\end{align*}
+Check Meadow: Stay gives $1 + 0.9(3.2) = 3.88 > 3.2$. Contradiction.
+
+\textbf{Attempt 4: Travel in both}
+\begin{align*}
+V_M &= 0.8 V_F \\
+V_F &= 0.8 V_M
+\end{align*}
+This gives $V_M = 0.64 V_M$, so $V_M = V_F = 0$.
+Check Meadow: Stay gives $1 + 0 = 1 > 0$. Contradiction.
+
+\section{The Solution}
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{
+\textbf{Optimal Policy:}
+\begin{itemize}
+    \item In Meadow: Stay (expected total reward = 10)
+    \item In Forest: Travel to Meadow (expected total reward = 8)
+\end{itemize}
+}}
+\end{center}
+
+\textbf{Intuition:} The Forest gives higher immediate reward (2 vs 1), but has terrible survival odds (50\%). It's better to escape to the Meadow and enjoy the safe, steady rewards there.
+
+\section{Key Takeaways for Your Problem}
+
+\begin{enumerate}
+    \item \textbf{States capture everything relevant about the future.} In our problem, location determines survival odds and rewards. In your particle problem, the offset $\Omega$ captures where you are in the gate cycle.
+    
+    \item \textbf{The Bellman equation is recursive.} The value of a state depends on values of states you might transition to. You solve by finding values that are self-consistent.
+    
+    \item \textbf{Optimal policy = argmax of Bellman equation.} Once you have $V$, the optimal action in state $s$ is whichever achieves the max.
+    
+    \item \textbf{Structure helps.} Here we had only 2 states. Your particle problem has infinitely many states $(\Omega, l)$, but the memorylessness of the exponential lets you reduce to a single function $U(\Omega)$.
+\end{enumerate}
+
+\section{Connection to Your Particle Problem}
+
+In your problem:
+\begin{itemize}
+    \item State: $(\Omega, l)$ where $\Omega \in (0, T_1]$ is gate cycle position, $l$ is lifespan
+    \item Action: wait time $w \geq 0$
+    \item Reward: $+1$ for each completed lap
+    \item Transition: new $\Omega' = (\Omega + w + \tau) \mod (T_1 + T_2)$, new $l' \sim \text{Exp}(\lambda)$
+\end{itemize}
+
+The key simplification: because $l'$ is independent of history, you can define
+\[
+U(\Omega) = \E_{l \sim \text{Exp}(\lambda)}[V(\Omega, l)]
+\]
+and the Bellman equation becomes
+\[
+V(\Omega, l) = \max_{w} \{1 + U(\Omega')\}
+\]
+
+If you can show $U(\Omega)$ is decreasing (later in the ON window is worse), then the optimal policy is to arrive as late as possible, which is exactly your $\Delta t$ formula.
+
+\end{document}
