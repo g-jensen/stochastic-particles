@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
   std::vector<float> rates = survival_rates(&sim,reset_config(should_reset_fn,reset_particle_fn));
 
   std::cout << "{\n"
-            << "  \"strategy\": \"none (upper bound)\",\n"
+            << "  \"strategy\": \"none\",\n"
             << "  \"velocity\": " << velocity << ",\n"
             << "  \"tau\": " << (2 * length / velocity) << ",\n"
             << "  \"mean_lifespan\": " << mean_lifespan << ",\n"
