@@ -28,3 +28,6 @@ echo "=== late_wait_time ==="
 echo ""
 echo "=== early_wait_time ==="
 ./build/early_wait_time "${args[@]}"
+echo ""
+echo "=== threshold_wait_time ==="
+./build/threshold_wait_time "${args[@]}" -c 1
