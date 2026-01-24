@@ -14,6 +14,10 @@ bool is_lifespan_during_gate_on(float lifespan, gate g) {
   return g.starting_state ? b : !b;
 }
 
+float no_wait_time(particle p, gate g, float length) {
+  return 0.f;
+}
+
 float late_wait_time(particle p, gate g, float length) {
   float tau = (2 * length) / p.velocity;
   float period = g.t1 + g.t2;

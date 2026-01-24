@@ -18,6 +18,7 @@ struct value_result {
 };
 
 bool is_lifespan_during_gate_on(float lifespan, gate g);
+float no_wait_time(particle p, gate g, float length);
 float late_wait_time(particle p, gate g, float length);
 float early_wait_time(particle p, gate g, float length);
 particle reset_particle_with_wait(simulation* sim, particle p, float length,
