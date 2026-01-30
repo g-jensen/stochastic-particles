@@ -132,7 +132,7 @@ void run_strategy_simulation(int argc, char* argv[], wait_strategy strategy,
   float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);
   float t1 = arg_float(argc, argv, "-t1", 1.f);
   float t2 = arg_float(argc, argv, "-t2", 1.f);
-  bool starting_state = arg_int(argc, argv, "-gs", 0) != 0;
+  bool starting_state = arg_int(argc, argv, "-gs", 1);
   float omega = arg_float(argc, argv, "-offset", 0.f);
   int particle_count = arg_int(argc, argv, "-n", 100000);
 
@@ -145,15 +145,15 @@ void run_strategy_simulation(int argc, char* argv[], wait_strategy strategy,
   std::cout << "{\n"
             << "  \"strategy\": \"" << strategy_name << "\",\n"
             << "  \"velocity\": " << velocity << ",\n"
-            << "  \"tau\": " << (2 * length / velocity) << ",\n"
+            // << "  \"tau\": " << (2 * length / velocity) << ",\n"
             << "  \"mean_lifespan\": " << mean_lifespan << ",\n"
-            << "  \"lambda\": " << (1.0 / mean_lifespan) << ",\n"
+            // << "  \"lambda\": " << (1.0 / mean_lifespan) << ",\n"
             << "  \"gate_t1\": " << t1 << ",\n"
             << "  \"gate_t2\": " << t2 << ",\n"
             << "  \"particle_count\": " << particle_count << ",\n"
             << "  \"offset\": " << omega << ",\n"
             << "  \"expected_laps\": " << result.expected_laps << ",\n"
-            << "  \"avg_survival_time\": " << result.avg_survival_time << ",\n"
+            << "  \"expected_survival_time\": " << result.avg_survival_time << ",\n"
             << "  \"distribution\": " << json_array(result.distribution) << ",\n"
             << "  \"seed\": " << seed << "\n"
             << "}" << std::endl;

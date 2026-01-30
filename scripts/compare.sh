@@ -17,17 +17,17 @@ if [[ -z "$seed" ]]; then
   args+=("-s" "$seed")
 fi
 
-echo "=== max_wait_laps (upper bound) ==="
+echo "=== no gates, max wait time (upper bound) ==="
 ./build/max_wait_laps "${args[@]}"
 echo ""
-echo "=== gates (lower bound) ==="
+echo "=== gates, no wait time (lower bound) ==="
 ./build/gates "${args[@]}"
 echo ""
-echo "=== late_wait_time ==="
+echo "=== gates, max wait time ==="
 ./build/late_wait_time "${args[@]}"
 echo ""
-echo "=== early_wait_time ==="
+echo "=== gates, low wait time ==="
 ./build/early_wait_time "${args[@]}"
 echo ""
-echo "=== threshold_wait_time ==="
+echo "=== gates, threshold wait time ==="
 ./build/threshold_wait_time "${args[@]}" -c 1
