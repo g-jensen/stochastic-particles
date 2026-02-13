@@ -21,35 +21,35 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 
 .PHONY: mean
 mean: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/mean examples/mean.cpp $(OBJS)
+	g++ -o $(OUTDIR)/mean examples/basic/mean.cpp $(OBJS)
 
 .PHONY: laps
 laps: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/laps examples/laps.cpp $(OBJS)
+	g++ -o $(OUTDIR)/laps examples/basic/laps.cpp $(OBJS)
 
 .PHONY: max_wait_laps
 max_wait_laps: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/max_wait_laps examples/max_wait_laps.cpp $(OBJS)
+	g++ -o $(OUTDIR)/max_wait_laps examples/wait_strategy/max_wait_laps.cpp $(OBJS)
 
 .PHONY: survival_rate
 survival_rate: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/survival_rate examples/survival_rate.cpp $(OBJS)
+	g++ -o $(OUTDIR)/survival_rate examples/basic/survival_rate.cpp $(OBJS)
 
 .PHONY: gates
 gates: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/gates examples/gates.cpp $(OBJS)
+	g++ -o $(OUTDIR)/gates examples/wait_strategy/gates.cpp $(OBJS)
 
 .PHONY: late_wait_time
 late_wait_time: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/late_wait_time examples/late_wait_time.cpp $(OBJS)
+	g++ -o $(OUTDIR)/late_wait_time examples/wait_strategy/late_wait_time.cpp $(OBJS)
 
 .PHONY: early_wait_time
 early_wait_time: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/early_wait_time examples/early_wait_time.cpp $(OBJS)
+	g++ -o $(OUTDIR)/early_wait_time examples/wait_strategy/early_wait_time.cpp $(OBJS)
 
 .PHONY: threshold_wait_time
 threshold_wait_time: $(OBJS) | $(OUTDIR)
-	g++ -o $(OUTDIR)/threshold_wait_time examples/threshold_wait_time.cpp $(OBJS)
+	g++ -o $(OUTDIR)/threshold_wait_time examples/wait_strategy/threshold_wait_time.cpp $(OBJS)
 
 .PHONY: latex
 latex:
