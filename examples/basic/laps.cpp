@@ -1,7 +1,7 @@
-#include "../headers/lap.h"
-#include "../headers/io.h"
-#include "../headers/cli.h"
-#include "../headers/rand.h"
+#include "../../headers/lap.h"
+#include "../../headers/io.h"
+#include "../../headers/cli.h"
+#include "../../headers/rand.h"
 
 int main(int argc, char* argv[]) {
   int seed = arg_int(argc, argv, "-s", -1);
