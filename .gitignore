@@ -11,3 +11,4 @@ log
 .clj-kondo
 .lsp
 build
+.venv
