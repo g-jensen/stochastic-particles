@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../headers/distribution.h"
-#include "../headers/simulation.h"
+#include "../../headers/distribution.h"
+#include "../../headers/simulation.h"
 
 float averge_lifespan(simulation& sim) {
   float lifespan_sum = 0;

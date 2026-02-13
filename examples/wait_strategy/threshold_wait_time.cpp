@@ -1,5 +1,5 @@
-#include "../headers/strategy.h"
-#include "../headers/cli.h"
+#include "../../headers/strategy.h"
+#include "../../headers/cli.h"
 
 int main(int argc, char* argv[]) {
   float mean_lifespan = arg_float(argc, argv, "-ml", 2.f);

@@ -1,7 +1,7 @@
 #include <iostream>
-#include "../headers/distribution.h"
-#include "../headers/simulation.h"
-#include "../headers/particle.h"
+#include "../../headers/distribution.h"
+#include "../../headers/simulation.h"
+#include "../../headers/particle.h"
 
 uint surivial_count(simulation& sim, float length) {
   uint count = 0;

@@ -1,7 +1,7 @@
-#include "../headers/lap.h"
-#include "../headers/io.h"
-#include "../headers/cli.h"
-#include "../headers/rand.h"
+#include "../../headers/lap.h"
+#include "../../headers/io.h"
+#include "../../headers/cli.h"
+#include "../../headers/rand.h"
 
 particle lap_particle_max_wait(simulation* sim, particle p, float length) {
   particle p1 = sim->create_particle();
