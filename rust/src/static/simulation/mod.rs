@@ -3,7 +3,7 @@ mod test;
 
 use fraction::Fraction;
 
-pub fn should_pass_lap(
+fn should_pass_lap(
     phase: &Fraction,
     lap_count: u64,
     travel_time: &Fraction,
