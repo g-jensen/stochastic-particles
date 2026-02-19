@@ -15,5 +15,6 @@ fn main() {
     let phase = arg_fraction(&args, "-phase", Fraction::from(0u64));
     let on_ratio = arg_fraction(&args, "-on-ratio", Fraction::new(1u64, 2u64));
     let travel_time = arg_fraction(&args, "-travel-time", Fraction::new(3u64, 10u64));
-    println!("{}", simulation::max_laps(&phase, &travel_time, &on_ratio));
+    let max_laps = 1_000_000;
+    println!("{:#?}", simulation::lap_count(&phase, &travel_time, &on_ratio,max_laps));
 }
