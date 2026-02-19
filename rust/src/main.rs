@@ -1,6 +1,8 @@
 mod r#static;
 
-fn arg_float(args: &[String], flag: &str, default: f32) -> f32 {
+use fraction::Fraction;
+
+fn arg_fraction(args: &[String], flag: &str, default: Fraction) -> Fraction {
     args.windows(2)
         .find(|w| w[0] == flag)
         .and_then(|w| w[1].parse().ok())
@@ -9,8 +11,8 @@ fn arg_float(args: &[String], flag: &str, default: f32) -> f32 {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let phase = arg_float(&args, "-phase", 0.0);
-    let on_ratio = arg_float(&args, "-on-ratio", 0.5);
-    let travel_time = arg_float(&args, "-travel-time", 0.3);
-    println!("{}", r#static::max_laps(phase, travel_time, on_ratio));
+    let phase = arg_fraction(&args, "-phase", Fraction::from(0u64));
+    let on_ratio = arg_fraction(&args, "-on-ratio", Fraction::new(1u64, 2u64));
+    let travel_time = arg_fraction(&args, "-travel-time", Fraction::new(3u64, 10u64));
+    println!("{}", r#static::max_laps(&phase, &travel_time, &on_ratio));
 }

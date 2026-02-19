@@ -1,17 +1,22 @@
 #[cfg(test)]
 mod test;
 
-pub fn mod_f(a: f32, b: f32) -> f32 {
-    a - b * ((a as i32) / (b as i32)) as f32
+use fraction::Fraction;
+
+pub fn should_pass_lap(
+    phase: &Fraction,
+    lap_count: u32,
+    travel_time: &Fraction,
+    on_ratio: &Fraction,
+) -> bool {
+    let lap_count = Fraction::from(lap_count as u64);
+    let one = Fraction::from(1u64);
+    (phase + lap_count * (*travel_time)) % one <= (*on_ratio)
 }
 
-pub fn should_pass_lap(phase: f32, lap_count: u32, travel_time: f32, on_ratio: f32) -> bool {
-    mod_f(phase + (lap_count as f32 * travel_time), 1.0) <= on_ratio
-}
-
-pub fn max_laps(phase: f32, travel_time: f32, on_ratio: f32) -> u32 {
+pub fn max_laps(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) -> u32 {
     let mut laps = 0;
-    while should_pass_lap(phase, laps+1, travel_time, on_ratio) {
+    while should_pass_lap(phase, laps + 1, travel_time, on_ratio) {
         laps += 1;
     }
     laps
