@@ -1,5 +1,5 @@
 use super::*;
-use crate::r#static::test::frac;
+use crate::basic::test::frac;
 
 #[test]
 fn should_pass_lap_zero_phase_within_on_ratio() {

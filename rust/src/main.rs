@@ -1,7 +1,7 @@
-mod r#static;
+mod basic;
 
 use fraction::Fraction;
-use r#static::simulation;
+use basic::simulation;
 
 fn arg_fraction(args: &[String], flag: &str, default: Fraction) -> Fraction {
     args.windows(2)

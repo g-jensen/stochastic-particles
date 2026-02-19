@@ -1,5 +1,5 @@
 use super::*;
-use crate::r#static::test::frac;
+use crate::basic::test::frac;
 
 #[test]
 fn lap_count_table() {
