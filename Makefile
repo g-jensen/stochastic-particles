@@ -8,7 +8,7 @@ OBJ_DIR = $(OUTDIR)/obj
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 
-all: mean survival_rate laps max_wait_laps gates late_wait_time early_wait_time threshold_wait_time
+all: mean survival_rate laps max_wait_laps gates late_wait_time early_wait_time threshold_wait_time static
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
@@ -50,6 +50,10 @@ early_wait_time: $(OBJS) | $(OUTDIR)
 .PHONY: threshold_wait_time
 threshold_wait_time: $(OBJS) | $(OUTDIR)
 	g++ -o $(OUTDIR)/threshold_wait_time examples/wait_strategy/threshold_wait_time.cpp $(OBJS)
+
+.PHONY: static
+static: $(OBJS) | $(OUTDIR)
+	g++ -o $(OUTDIR)/static examples/static.cpp $(OBJS)
 
 .PHONY: latex
 latex:
