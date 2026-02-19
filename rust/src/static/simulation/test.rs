@@ -4,7 +4,7 @@ use crate::r#static::test::frac;
 #[test]
 fn should_pass_lap_zero_phase_within_on_ratio() {
     assert_eq!(
-        should_pass_lap(&frac(0u64, 1u64), 0, &frac(1, 1), &frac(1, 2)),
+        should_pass_lap(&frac(0, 1), 0, &frac(1, 1), &frac(1, 2)),
         true
     );
 }
