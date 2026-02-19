@@ -1,9 +1,5 @@
 use super::*;
-use fraction::Fraction;
-
-fn frac(n: u64, d: u64) -> Fraction {
-    Fraction::new(n, d)
-}
+use crate::r#static::test::frac;
 
 #[test]
 fn should_pass_lap_zero_phase_within_on_ratio() {
@@ -15,17 +11,26 @@ fn should_pass_lap_zero_phase_within_on_ratio() {
 
 #[test]
 fn should_pass_lap_phase_beyond_on_ratio() {
-    assert_eq!(should_pass_lap(&frac(3, 5), 0, &frac(1, 1), &frac(1, 2)), false);
+    assert_eq!(
+        should_pass_lap(&frac(3, 5), 0, &frac(1, 1), &frac(1, 2)),
+        false
+    );
 }
 
 #[test]
 fn should_pass_lap_count_pushes_phase_beyond_on_ratio() {
-    assert_eq!(should_pass_lap(&frac(1, 5), 1, &frac(1, 2), &frac(1, 2)), false);
+    assert_eq!(
+        should_pass_lap(&frac(1, 5), 1, &frac(1, 2), &frac(1, 2)),
+        false
+    );
 }
 
 #[test]
 fn should_pass_lap_wraps_phase_past_one() {
-    assert_eq!(should_pass_lap(&frac(4, 5), 1, &frac(1, 2), &frac(1, 2)), true);
+    assert_eq!(
+        should_pass_lap(&frac(4, 5), 1, &frac(1, 2), &frac(1, 2)),
+        true
+    );
 }
 
 #[test]
