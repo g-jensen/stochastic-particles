@@ -25,8 +25,7 @@ fn mod_inverse(p: i64, q: i64) -> i64 {
     ((old_s % q) + q) % q
 }
 
-// assumes !should_lap_forever
-pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) -> u64 {
+pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) -> Option<u64> {
     let p: u64 = (*travel_time.numer().unwrap()).try_into().unwrap();
     let q: u64 = (*travel_time.denom().unwrap()).try_into().unwrap();
     let p_inv: u64 = mod_inverse(p as i64, q as i64).try_into().unwrap();
@@ -34,5 +33,5 @@ pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) 
     (0..q)
     .filter(|k| ((phase + Fraction::new(*k, q)) % one) > *on_ratio)
     .map(|k| (k * p_inv) % q)
-    .min().unwrap()-1
+    .min().and_then(|n| Some(n-1))
 }
