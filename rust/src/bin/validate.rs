@@ -1,12 +1,12 @@
 use fraction::Fraction;
 use stochastic::basic::{sampling, simulation, theory, validation};
-use stochastic::cli::{arg_fraction, arg_uint};
+use stochastic::cli::{arg};
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let granularity = arg_uint(&args, "-granularity", 10);
-    let max_travel_time = arg_fraction(&args, "-max-travel-time", Fraction::new(1u64, 1u64));
-    let max_laps = arg_uint(&args, "-max-laps", granularity+1);
+    let granularity = arg(&args, "-granularity", 10);
+    let max_travel_time = arg(&args, "-max-travel-time", Fraction::new(1u64, 1u64));
+    let max_laps = arg(&args, "-max-laps", granularity+1);
 
     let mut count = 0u64;
     let mut error = None;
