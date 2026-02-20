@@ -2,16 +2,14 @@
 mod test;
 
 use fraction::Fraction;
-use fraction::One;
 
 fn fractional_part(f: Fraction) -> Fraction {
     f - f.floor()
 }
 
 fn should_lap_forever(phase: &Fraction, q: u64, on_ratio: &Fraction) -> bool {
-    let one = Fraction::one();
     let q_frac = Fraction::from(q);
-    fractional_part(phase + (((q_frac * (one - *phase)).ceil() - 1) / q_frac)).le(on_ratio)
+    (phase + ((q_frac - 1)/q_frac)).le(on_ratio)
 }
 
 fn mod_inverse(p: i64, q: i64) -> i64 {
@@ -29,7 +27,8 @@ fn mod_inverse(p: i64, q: i64) -> i64 {
     ((old_s % q) + q) % q
 }
 
-pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) -> Option<u64> {
+#[allow(dead_code)]
+fn slow_lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) -> Option<u64> {
     let p: u64 = *travel_time.numer().unwrap();
     let q: u64 = *travel_time.denom().unwrap();
     if should_lap_forever(phase, q, on_ratio) {
@@ -43,4 +42,21 @@ pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) 
         .map(|n| if n == 0 {q} else {n})
         .min()
         .and_then(|n| Some(n-1))
+}
+
+pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) -> Option<u64> {
+    let p: u64 = *travel_time.numer().unwrap();
+    let q: u64 = *travel_time.denom().unwrap();
+    if should_lap_forever(phase, q, on_ratio) {
+        return None;
+    }
+    
+    let mut m = 0;
+    for n in 1..=q {
+        m = (m+p) % q;
+        if fractional_part(phase + Fraction::new(m,q)).gt(on_ratio) {
+            return Some(n-1);
+        }
+    }
+    return None;
 }
