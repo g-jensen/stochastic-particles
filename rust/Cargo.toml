@@ -5,3 +5,11 @@ edition = "2024"
 
 [dependencies]
 fraction = "0.15.3"
+
+[[bin]]
+name = "basic-generate"
+path = "src/bin/basic/generate.rs"
+
+[[bin]]
+name = "basic-validate"
+path = "src/bin/basic/validate.rs"
