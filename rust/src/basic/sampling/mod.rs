@@ -13,6 +13,12 @@ pub fn sample(
     });
 }
 
+fn each_unit_fraction(granularity: u64, body: &mut impl FnMut(Fraction)) {
+    for i in 0..granularity {
+        body(Fraction::new(i, granularity));
+    }
+}
+
 fn sample_travel_times_for_phase(
     granularity: u64,
     max_travel_time: Fraction,
@@ -28,11 +34,5 @@ fn sample_travel_times_for_phase(
         each_unit_fraction(granularity, &mut |on_ratio| {
             callback(phase, travel_time, on_ratio);
         });
-    }
-}
-
-fn each_unit_fraction(granularity: u64, body: &mut impl FnMut(Fraction)) {
-    for i in 0..granularity {
-        body(Fraction::new(i, granularity));
     }
 }
