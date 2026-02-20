@@ -8,20 +8,35 @@ fn main() {
     let max_travel_time = arg_fraction(&args, "-max-travel-time", Fraction::new(3u64, 1u64));
     let max_laps = arg_uint(&args, "-max-laps", 1_000_000);
 
-    let mut inputs: Vec<(Fraction, Fraction, Fraction)> = Vec::new();
+    let mut count = 0u64;
+    let mut error = None;
+
     sampling::sample(
         granularity,
         max_travel_time,
         &mut |phase, travel_time, on_ratio| {
-            inputs.push((phase, travel_time, on_ratio));
+            if error.is_some() {
+                return;
+            }
+            count += 1;
+            if let Err(e) = validation::validate(
+                &phase,
+                &travel_time,
+                &on_ratio,
+                theory::lap_count,
+                simulation::lap_count,
+                max_laps,
+            ) {
+                error = Some(e);
+            }
         },
     );
 
-    println!("Validating {} input combinations...", inputs.len());
+    println!("Validated {count} input combinations.");
 
-    match validation::validate(&inputs, theory::lap_count, simulation::lap_count, max_laps) {
-        Ok(()) => println!("All inputs match."),
-        Err(e) => {
+    match error {
+        None => println!("All inputs match."),
+        Some(e) => {
             println!("Mismatch found!");
             println!("  phase: {}", e.phase);
             println!("  travel_time: {}", e.travel_time);
