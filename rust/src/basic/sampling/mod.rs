@@ -12,6 +12,15 @@ pub fn sample_phase(
     });
 }
 
+pub fn sample_on_ratio(
+    granularity: u64,
+    callback: &mut impl FnMut(Fraction),
+) {
+    each_unit_fraction(granularity, 1, &mut |on_ratio| {
+        callback(on_ratio)
+    });
+}
+
 pub fn sample(
     granularity: u64,
     max_travel_time: Fraction,
