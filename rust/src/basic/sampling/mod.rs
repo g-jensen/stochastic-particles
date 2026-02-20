@@ -8,13 +8,13 @@ pub fn sample(
     max_travel_time: Fraction,
     callback: &mut impl FnMut(Fraction, Fraction, Fraction),
 ) {
-    each_unit_fraction(granularity, &mut |phase| {
+    each_unit_fraction(granularity, 0, &mut |phase| {
         sample_travel_times_for_phase(granularity, max_travel_time, phase, callback);
     });
 }
 
-fn each_unit_fraction(granularity: u64, body: &mut impl FnMut(Fraction)) {
-    for i in 0..granularity {
+fn each_unit_fraction(granularity: u64, start: u64, body: &mut impl FnMut(Fraction)) {
+    for i in start..granularity {
         body(Fraction::new(i, granularity));
     }
 }
@@ -31,7 +31,7 @@ fn sample_travel_times_for_phase(
         if travel_time > max_travel_time {
             break;
         }
-        each_unit_fraction(granularity, &mut |on_ratio| {
+        each_unit_fraction(granularity, 1, &mut |on_ratio| {
             callback(phase, travel_time, on_ratio);
         });
     }
