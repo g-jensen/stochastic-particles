@@ -37,24 +37,24 @@ fn sample_produces_18_combinations_for_granularity_3() {
         calls,
         vec![
             (frac(0, 3), frac(1, 3), frac(1, 3)),
-            (frac(0, 3), frac(1, 3), frac(2, 3)),
             (frac(0, 3), frac(2, 3), frac(1, 3)),
-            (frac(0, 3), frac(2, 3), frac(2, 3)),
             (frac(0, 3), frac(3, 3), frac(1, 3)),
+            (frac(0, 3), frac(1, 3), frac(2, 3)),
+            (frac(0, 3), frac(2, 3), frac(2, 3)),
             (frac(0, 3), frac(3, 3), frac(2, 3)),
             
             (frac(1, 3), frac(1, 3), frac(1, 3)),
-            (frac(1, 3), frac(1, 3), frac(2, 3)),
             (frac(1, 3), frac(2, 3), frac(1, 3)),
-            (frac(1, 3), frac(2, 3), frac(2, 3)),
             (frac(1, 3), frac(3, 3), frac(1, 3)),
+            (frac(1, 3), frac(1, 3), frac(2, 3)),
+            (frac(1, 3), frac(2, 3), frac(2, 3)),
             (frac(1, 3), frac(3, 3), frac(2, 3)),
 
             (frac(2, 3), frac(1, 3), frac(1, 3)),
-            (frac(2, 3), frac(1, 3), frac(2, 3)),
             (frac(2, 3), frac(2, 3), frac(1, 3)),
-            (frac(2, 3), frac(2, 3), frac(2, 3)),
             (frac(2, 3), frac(3, 3), frac(1, 3)),
+            (frac(2, 3), frac(1, 3), frac(2, 3)),
+            (frac(2, 3), frac(2, 3), frac(2, 3)),
             (frac(2, 3), frac(3, 3), frac(2, 3)),
         ]
     );
