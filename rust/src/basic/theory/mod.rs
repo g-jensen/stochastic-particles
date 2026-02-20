@@ -33,9 +33,10 @@ pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) 
     }
     let p_inv: u64 = mod_inverse(p as i64, q as i64).try_into().unwrap();
 
-    (0..q)
+    (1..q)
         .filter(|k| ((phase + Fraction::new(*k, q)) % 1) > *on_ratio)
         .map(|k| (k * p_inv) % q)
         .min()
         .and_then(|n| Some(n - 1))
+        .or(Some(0))
 }
