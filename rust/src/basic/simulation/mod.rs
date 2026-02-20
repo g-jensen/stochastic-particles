@@ -15,15 +15,17 @@ fn should_pass_lap(
 }
 
 pub fn lap_count(
-    phase: &Fraction, 
-    travel_time: &Fraction, 
-    on_ratio: &Fraction, 
-    max_laps: u64
-)-> Option<u64> {
+    phase: &Fraction,
+    travel_time: &Fraction,
+    on_ratio: &Fraction,
+    max_laps: u64,
+) -> Option<u64> {
     let mut num_laps = 0;
     while should_pass_lap(phase, num_laps + 1, travel_time, on_ratio) {
         num_laps += 1;
-        if num_laps > max_laps {return None}
+        if num_laps > max_laps {
+            return None;
+        }
     }
     Some(num_laps)
 }
