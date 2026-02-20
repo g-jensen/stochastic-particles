@@ -25,12 +25,9 @@ fn sample_travel_times_for_phase(
     phase: Fraction,
     callback: &mut impl FnMut(Fraction, Fraction, Fraction),
 ) {
-    let step = Fraction::new(1u64, granularity);
-    for tt_i in 1u64.. {
-        let travel_time = step * Fraction::from(tt_i);
-        if travel_time > max_travel_time {
-            break;
-        }
+    let step = max_travel_time / granularity;
+    for tt_i in 1..granularity+1 {
+        let travel_time = step * tt_i;
         each_unit_fraction(granularity, 1, &mut |on_ratio| {
             callback(phase, travel_time, on_ratio);
         });

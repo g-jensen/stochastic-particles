@@ -61,7 +61,7 @@ fn sample_produces_18_combinations_for_granularity_3() {
 }
 
 #[test]
-fn sample_includes_travel_times_beyond_granularity_steps() {
+fn sample_travel_time_has_granularity_steps() {
     let mut calls: Vec<(Fraction, Fraction, Fraction)> = Vec::new();
     sample(2, frac(3, 2), &mut |phase, travel_time, on_ratio| {
         calls.push((phase, travel_time, on_ratio));
@@ -69,11 +69,9 @@ fn sample_includes_travel_times_beyond_granularity_steps() {
     assert_eq!(
         calls,
         vec![
-            (frac(0, 2), frac(1, 2), frac(1, 2)),
-            (frac(0, 2), frac(2, 2), frac(1, 2)),
+            (frac(0, 2), frac(3, 4), frac(1, 2)),
             (frac(0, 2), frac(3, 2), frac(1, 2)),
-            (frac(1, 2), frac(1, 2), frac(1, 2)),
-            (frac(1, 2), frac(2, 2), frac(1, 2)),
+            (frac(1, 2), frac(3, 4), frac(1, 2)),
             (frac(1, 2), frac(3, 2), frac(1, 2)),
         ]
     );
