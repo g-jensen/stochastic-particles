@@ -28,7 +28,7 @@ fn main() -> io::Result<()> {
     let mut count = 0u64;
 
     println!("Using strategy: {:#?}",strategy);
-    writeln!(writer, "phase, travel_time, on_ratio, laps")?;
+    writeln!(writer, "phase, on_ratio, travel_time, lifespan")?;
     sampling::sample(
         granularity,
         max_travel_time,
@@ -39,8 +39,9 @@ fn main() -> io::Result<()> {
                 Strategy::THEORY => laps_opt = theory::lap_count(&phase,&travel_time,&on_ratio),
                 Strategy::SIMULATION => laps_opt = simulation::lap_count(&phase,&travel_time,&on_ratio,max_laps),
             }
-            let laps_str = laps_opt.and_then(|lap_count| Some(lap_count.to_string())).or(Some(String::from("inf"))).unwrap();
-            writeln!(writer, "{}, {}, {}, {}", &phase, &travel_time, &on_ratio, laps_str).unwrap();
+            let lifespan_opt = laps_opt.and_then(|laps| Some(Fraction::from(laps+1) * travel_time));
+            let lifespan_str = lifespan_opt.and_then(|lifespan| Some(lifespan.to_string())).or(Some(String::from("inf"))).unwrap();
+            writeln!(writer, "{}, {}, {}, {}", &phase, &on_ratio, &travel_time, lifespan_str).unwrap();
         },
     );
 
