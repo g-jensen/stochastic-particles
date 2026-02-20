@@ -3,6 +3,15 @@ mod test;
 
 use fraction::Fraction;
 
+pub fn sample_phase(
+    granularity: u64,
+    callback: &mut impl FnMut(Fraction),
+) {
+    each_unit_fraction(granularity, 0, &mut |phase| {
+        callback(phase)
+    });
+}
+
 pub fn sample(
     granularity: u64,
     max_travel_time: Fraction,
