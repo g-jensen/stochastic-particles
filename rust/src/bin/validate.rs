@@ -6,7 +6,7 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let granularity = arg_uint(&args, "-granularity", 10);
     let max_travel_time = arg_fraction(&args, "-max-travel-time", Fraction::new(3u64, 1u64));
-    let max_laps = arg_uint(&args, "-max-laps", 1_000_000);
+    let max_laps = arg_uint(&args, "-max-laps", granularity+1);
 
     let mut count = 0u64;
     let mut error = None;
