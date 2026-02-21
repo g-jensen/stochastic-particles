@@ -1,5 +1,5 @@
 use super::*;
-use crate::basic::test::frac;
+use crate::basic::{test::frac};
 
 #[test]
 fn optimize_some_lifespan() {
@@ -19,7 +19,7 @@ fn optimize_some_lifespan() {
 #[test]
 fn optimize_passes_params_to_lap_fn() {
     let (travel_time, lifespan) = optimize(frac(1,1),frac(3,2),3,frac(1,1),|phase, travel_time, on_ratio| {
-        if phase == frac(1,1) && on_ratio == frac(3,2) && travel_time == frac(2,3) {
+        if *phase == frac(1,1) && *on_ratio == frac(3,2) && *travel_time == frac(2,3) {
             Some(3)
         } else {
             Some(0)

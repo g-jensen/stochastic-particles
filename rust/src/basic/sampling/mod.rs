@@ -26,10 +26,10 @@ pub fn sample_travel_time(
     granularity: u64,
     callback: &mut impl FnMut(Fraction),
 ) {
-    let mut step = max_travel_time / granularity;
-    for _ in 1..granularity {
-        callback(step);
-        step += step;
+    let step = max_travel_time / granularity;
+    for i in 1..granularity {
+        let travel_time = step * i;
+        callback(travel_time);
     }
 }
 
