@@ -56,6 +56,55 @@ fn sample_on_ratio_produces_2_combinations_for_granularity_3() {
 }
 
 #[test]
+fn sample_travel_time_behaves_like_ratio_with_max_1() {
+    let one = frac(1,1);
+    let mut calls: Vec<Fraction> = Vec::new();
+    sample_travel_time(one, 1, &mut |phase| {
+        calls.push(phase);
+    });
+    assert_eq!(calls, vec![]);
+
+    let mut calls: Vec<Fraction> = Vec::new();
+    sample_travel_time(one, 2, &mut |phase| {
+        calls.push(phase);
+    });
+    assert_eq!(calls, vec![frac(1,2)]);
+
+    let mut calls: Vec<Fraction> = Vec::new();
+    sample_travel_time(one, 3, &mut |phase| {
+        calls.push(phase);
+    });
+    assert_eq!(calls, vec![frac(1,3), frac(2,3)]);
+}
+
+#[test]
+fn sample_travel_time_granulates_up_to_max() {
+    let mut calls: Vec<Fraction> = Vec::new();
+    sample_travel_time(frac(2,1), 2, &mut |phase| {
+        calls.push(phase);
+    });
+    assert_eq!(calls, vec![frac(1,1)]);
+
+    let mut calls: Vec<Fraction> = Vec::new();
+    sample_travel_time(frac(3,1), 2, &mut |phase| {
+        calls.push(phase);
+    });
+    assert_eq!(calls, vec![frac(3,2)]);
+
+    let mut calls: Vec<Fraction> = Vec::new();
+    sample_travel_time(frac(1,1), 3, &mut |phase| {
+        calls.push(phase);
+    });
+    assert_eq!(calls, vec![frac(1,3), frac(2,3)]);
+
+    let mut calls: Vec<Fraction> = Vec::new();
+    sample_travel_time(frac(3,1), 3, &mut |phase| {
+        calls.push(phase);
+    });
+    assert_eq!(calls, vec![frac(1,1), frac(2,1)]);
+}
+
+#[test]
 fn sample_does_not_call_callback_for_granularity_1() {
     let mut calls: Vec<(Fraction, Fraction, Fraction)> = Vec::new();
     sample(1, frac(1, 1), &mut |phase, travel_time, on_ratio| {
