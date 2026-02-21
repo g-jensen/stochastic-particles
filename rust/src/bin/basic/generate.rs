@@ -29,7 +29,7 @@ fn main() -> io::Result<()> {
 
     println!("Using strategy: {:#?}",strategy);
     writeln!(writer, "phase, on_ratio, travel_time, lifespan")?;
-    sampling::sample(
+    sampling::sample_all(
         granularity,
         max_travel_time,
         &mut |phase, travel_time, on_ratio| {

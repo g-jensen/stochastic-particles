@@ -11,7 +11,7 @@ fn main() {
     let mut count = 0u64;
     let mut error = None;
 
-    sampling::sample(
+    sampling::sample_all(
         granularity,
         max_travel_time,
         &mut |phase, travel_time, on_ratio| {

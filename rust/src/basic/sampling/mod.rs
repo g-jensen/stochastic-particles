@@ -33,7 +33,7 @@ pub fn sample_travel_time(
     }
 }
 
-pub fn sample(
+pub fn sample_all(
     granularity: u64,
     max_travel_time: Fraction,
     callback: &mut impl FnMut(Fraction, Fraction, Fraction),

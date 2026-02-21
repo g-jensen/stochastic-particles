@@ -107,7 +107,7 @@ fn sample_travel_time_granulates_up_to_max() {
 #[test]
 fn sample_does_not_call_callback_for_granularity_1() {
     let mut calls: Vec<(Fraction, Fraction, Fraction)> = Vec::new();
-    sample(1, frac(1, 1), &mut |phase, travel_time, on_ratio| {
+    sample_all(1, frac(1, 1), &mut |phase, travel_time, on_ratio| {
         calls.push((phase, travel_time, on_ratio));
     });
     assert_eq!(calls, vec![]);
@@ -116,7 +116,7 @@ fn sample_does_not_call_callback_for_granularity_1() {
 #[test]
 fn sample_produces_4_combinations_for_granularity_2() {
     let mut calls: Vec<(Fraction, Fraction, Fraction)> = Vec::new();
-    sample(2, frac(1, 1), &mut |phase, travel_time, on_ratio| {
+    sample_all(2, frac(1, 1), &mut |phase, travel_time, on_ratio| {
         calls.push((phase, travel_time, on_ratio));
     });
     assert_eq!(
@@ -131,7 +131,7 @@ fn sample_produces_4_combinations_for_granularity_2() {
 #[test]
 fn sample_produces_12_combinations_for_granularity_3() {
     let mut calls: Vec<(Fraction, Fraction, Fraction)> = Vec::new();
-    sample(3, frac(1, 1), &mut |phase, travel_time, on_ratio| {
+    sample_all(3, frac(1, 1), &mut |phase, travel_time, on_ratio| {
         calls.push((phase, travel_time, on_ratio));
     });
     assert_eq!(
@@ -158,7 +158,7 @@ fn sample_produces_12_combinations_for_granularity_3() {
 #[test]
 fn sample_travel_time_has_granularity_minus_one_steps() {
     let mut calls: Vec<(Fraction, Fraction, Fraction)> = Vec::new();
-    sample(2, frac(3, 2), &mut |phase, travel_time, on_ratio| {
+    sample_all(2, frac(3, 2), &mut |phase, travel_time, on_ratio| {
         calls.push((phase, travel_time, on_ratio));
     });
     assert_eq!(
