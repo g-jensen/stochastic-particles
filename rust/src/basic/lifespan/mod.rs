@@ -7,7 +7,7 @@ mod test;
 
 fn lifespan_from_lap_count(lap_count: Option<u64>, travel_time: Fraction) -> Fraction {
     lap_count
-        .and_then(|laps| Some(Fraction::from(laps)*travel_time))
+        .and_then(|laps| Some(Fraction::from(laps+1)*travel_time))
         .unwrap_or(Fraction::Infinity(fraction::Sign::Plus))
 }
 
