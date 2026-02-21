@@ -9,9 +9,7 @@ fn should_pass_lap(
     travel_time: &Fraction,
     on_ratio: &Fraction,
 ) -> bool {
-    let lap_count = Fraction::from(lap_count);
-    let one = Fraction::from(1u64);
-    (phase + lap_count * (*travel_time)) % one <= (*on_ratio)
+    (phase + (travel_time * lap_count)) % 1 <= (*on_ratio)
 }
 
 pub fn lap_count(

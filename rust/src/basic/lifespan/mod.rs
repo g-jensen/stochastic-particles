@@ -1,4 +1,4 @@
-use fraction::{ConstZero, Fraction};
+use fraction::{ConstZero, Fraction, Sign};
 
 use crate::basic::sampling::sample_travel_time;
 
@@ -7,8 +7,8 @@ mod test;
 
 fn lifespan_from_lap_count(lap_count: Option<u64>, travel_time: Fraction) -> Fraction {
     lap_count
-        .and_then(|laps| Some(Fraction::from(laps+1)*travel_time))
-        .unwrap_or(Fraction::Infinity(fraction::Sign::Plus))
+        .and_then(|laps| Some(travel_time*(laps+1)))
+        .unwrap_or(Fraction::Infinity(Sign::Plus))
 }
 
 pub fn optimize(

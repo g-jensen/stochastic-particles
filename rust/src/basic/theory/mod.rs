@@ -8,8 +8,7 @@ fn fractional_part(f: Fraction) -> Fraction {
 }
 
 fn should_lap_forever(phase: &Fraction, q: u64, on_ratio: &Fraction) -> bool {
-    let q_frac = Fraction::from(q);
-    (phase + ((q_frac - 1)/q_frac)).le(on_ratio)
+    (phase + Fraction::new(q - 1,q)).le(on_ratio)
 }
 
 fn mod_inverse(p: i64, q: i64) -> i64 {
