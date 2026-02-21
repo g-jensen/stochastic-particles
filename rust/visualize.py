@@ -2,7 +2,7 @@ import csv
 import math
 import sys
 from fractions import Fraction
-from collections import defaultdict
+
 
 import matplotlib
 matplotlib.use("Agg")
@@ -19,25 +19,13 @@ def parse_value(s):
 
 
 def load_csv(path):
-    rows = []
+    results = {}
     with open(path) as f:
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            phase, on_ratio, travel_time, lifespan = [parse_value(c) for c in row]
-            rows.append((phase, on_ratio, travel_time, lifespan))
-    return rows
-
-
-def best_travel_time_per_cell(rows):
-    groups = defaultdict(list)
-    for phase, on_ratio, travel_time, lifespan in rows:
-        groups[(phase, on_ratio)].append((travel_time, lifespan))
-
-    results = {}
-    for key, entries in groups.items():
-        best_tt, best_ls = max(entries, key=lambda e: e[1])
-        results[key] = best_tt
+            phase, on_ratio, optimal_tt, _optimal_ls = [parse_value(c) for c in row]
+            results[(phase, on_ratio)] = optimal_tt
     return results
 
 
@@ -151,8 +139,7 @@ def main():
     csv_path = sys.argv[1] if len(sys.argv) > 1 else "output.csv"
     out_path = sys.argv[2] if len(sys.argv) > 2 else "visualization.png"
 
-    rows = load_csv(csv_path)
-    results = best_travel_time_per_cell(rows)
+    results = load_csv(csv_path)
     phases, on_ratios, grid = build_grid(results)
     render(out_path, phases, on_ratios, grid)
 
