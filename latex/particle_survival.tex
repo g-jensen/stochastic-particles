@@ -10,11 +10,30 @@
 
 % Useful packages
 \usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\theoremstyle{definition} % Optional: styles the body text in normal (Roman) font
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{lemma}{Lemma}[section]
 
-\newcommand{\numLaps}{\text{\# of laps}}
-\newcommand{\modx}{ \ \text{mod} \ }
+\newcommand{\onRatio}{ r }
+\newcommand{\safeSet}{ S }
+\newcommand{\holeSet}{ H }
+\newcommand{\travelTime}{ \alpha }
+\newcommand{\longestTravelTime}{ \travelTime^{*} }
+\newcommand{\phase}{ \phi }
+\newcommand{\arrivalTime}[1]{ x_#1 }
+\newcommand{\modx}{ \text{mod} \ }
+\newcommand{\fatalIndex}{ n^{*} }
+\newcommand{\lifespan}{ L }
+\newcommand{\optimalTravelTimes}{ A }
+
+% \newcommand{\argmax}{ \text{argmax} }
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \title{Particle Survival}
 \author{}
@@ -30,130 +49,117 @@
 
 \section{Introduction}
 
-This document explores the survival of particles with certain parameters. In particular, the particles live in 1-dimensional space with parameters such as lifespan and velocity. A particle starts at $x=0$ and its goal is to reach $x=1$ and then come back to $x=0$ before running out of lifespan. This is referred to as lapping.
+This document explores the survival of a particle that lives in 1-dimensional space with a timed gate. A particle travels for some period of time repeatedly. At the end of each period, if the gate is off, the particle dies. Otherwise, it continues traveling with the same period.
 
-\section{Scenarios}
+\section{The Gate–Particle Model}
 
-\subsection{Lifespan Conforming to an Exponential Distribution}
+We normalize the aforementioned period to be 1.
 
-Suppose that a particle $p$ has a velocity $v>0$ and a lifespan of $l$ seconds, sampled from an exponential probability distribution with mean $1/\lambda$:
-\[
-P(x)=\lambda e^{-\lambda x}
-\]
-Then, the particle can travel from $x=0$ to $x=1$ and back to $x=0$ in $2/v$ seconds, so the probability of surviving a lap is the probability that the particle's lifespan is at least $2/v$:
-\[
-S(l):=\Pr(l \ge 2/v)=\int_{2/v}^{\infty}P(x)dx=e^{-2\lambda/v}.
-\]
-\href{https://github.com/g-jensen/stochastic-particles/blob/master/examples/survival_rate.cpp}{Simulation Code on GitHub}
+\begin{definition}
+A \textit{\textbf{gate}} with \textit{on ratio} $\onRatio\in(0,1)$ is \textit{open} at time $t$ if $t\in \safeSet:=[0,r)$ and \textit{closed} if $t\in \holeSet:=[r,1)$. 
+\label{def:gate}
+\end{definition}
 
-\subsection{Multiple Laps}
+\begin{definition}
+A \textit{\textbf{particle}} with \textit{travel time} $\travelTime\in(0,1)$ and \textit{phase} $\phase\in[0,1)$ has \textit{arrival times}
+\[
+\arrivalTime{n}=\phase+\travelTime n \ (\modx 1) \ \ \ \forall n\in \mathbb{N}.
+\] 
+\label{def:particle}
+\end{definition}
 
-Assume the conditions of the previous scenario, but now consider a particle doing multiple laps. In this way, $x=0$ serves as a sort of resource generator that the particle is using to stay alive while exploring. Now we can formulate some more questions:\\
-\\
-(1) What is the probability that a particle laps exactly $n$ times?\\
-(2) What is the probability that a particle laps at least $n$ times?\\
-(3) What is the expected number of laps for a particle?
+\begin{definition}
+ The \textit{\textbf{fatal index}} of a particle is the first index at which the particle arrives when the gate is closed
+\[
+\fatalIndex(\travelTime,\phase,\onRatio)=\min\{n : \arrivalTime{n}\in \holeSet\}.
+\] 
+\label{def:fatal_index}
+\end{definition}
 
-\subsubsection{Basic Theory}
+\begin{definition}
+ The \textit{\textbf{lifespan}} of a particle is defined as
+\begin{center}    
+$\lifespan(\travelTime,\phase,\onRatio)=\travelTime \cdot \fatalIndex.$\footnote{$\lifespan$ can alternatively be defined, perhaps more intuitively, as $\lifespan=\travelTime \cdot (\fatalIndex+1)$.}
+\end{center}
+If a particle has no fatal index, we say $\lifespan=\infty$.
 
-Regarding (1), we know that $S(l)$ is independent for each lap, so lapping exactly $n$ times is equivalent to repeatedly surviving exactly $n$ times and then not surviving once:
+\label{def:lifespan}
+\end{definition}
+
+\subsection{Optimization}
+
+\begin{definition}
+ The set of \textit{\textbf{optimal travel times}} $\optimalTravelTimes$ is the set of travel times that maximize lifespan
 \[
-P(\numLaps=n) = (S(l))^n(1-S(l)) = e^{-2\lambda n/v}\left(1-e^{-2\lambda/v}\right).
-\]
-And for (2), it's the same but without the assumption of not surviving after the $n$ resets:
+\optimalTravelTimes(\phase,\onRatio)=\argmax_{\travelTime\in\mathbb{Q}} \lifespan(\travelTime,\phase,\onRatio).
+\] 
+In addition, we denote the longest optimal travel time $\longestTravelTime=\max \optimalTravelTimes$.
+\label{def:optimal_travel_times}
+\end{definition}
+
+\begin{proposition}
+If $\travelTime\in \mathbb{R} \setminus \mathbb{Q}$, then $\fatalIndex$ exists.
+\begin{proof}
+    By Weyl's equidistribution theorem, the orbit $\{\arrivalTime{n}\}$ is equidistributed on $[0,1)$ when $\travelTime\in\mathbb{R} \setminus \mathbb{Q}$. Since $H=[r,1)$ has positive measure $1-r>0$, there exists an $n$ such that $\arrivalTime{n}\in H$ and therefore $\fatalIndex$ exists.
+\end{proof}
+\end{proposition}
+
+Now it is natural to wonder about the case where $\travelTime\in\mathbb{Q}$. We will explore this with the help of a few Lemmas.
+\newpage
+\begin{lemma}  If $\alpha=p/q$ in lowest terms, arrival times are $q$-cyclic:
 \[
-P(\numLaps \ge n) = (S(l))^n = e^{-2\lambda n/v}.
+    \left(\phase + \alpha n\right) \ \modx 1 = \left(\phase + \alpha (n+q)\right) \ \modx 1
 \]
-Note that (2) is also the sum of (1) for all $k\ge n$:
+\begin{proof}
+    \begin{align*}
+        \left(\phase + \alpha (n+q)\right) \ \modx 1 = & \left(\phase + \frac{p}{q} (n+q)\right) \ \modx 1\\
+        = & \left(\phase + \frac{pn}{q} +p\right) \ \modx 1\\
+        = & \left(\phase + \frac{pn}{q}\right) \ \modx 1 = \left(\phase + \alpha n\right) \ \modx 1.
+    \end{align*}
+\end{proof}
+\end{lemma}
+
+\begin{lemma} If $\alpha=p/q$ in lowest terms, arrival times form a regular $q$-gon:
 \[
-P(\numLaps\ge n) = \sum_{k=n}^\infty P(\numLaps = k)=\sum_{k=n}^\infty (S(l))^k(1-S(l))
+\Biggl\{ \left(\phase + \alpha n\right) \modx 1 : n\in\mathbb{N} \Biggr\} = \Biggl\{ \left(\phase + \frac{k}{q}\right) \modx 1 : k\in\{0,1,...,q-1\}\Biggr\}.
 \]
-which, more generally, yields
+\begin{proof}
+Denote
 \[
-\sum_{k=n}^\infty (S(l))^k(1-S(l))= (S(l))^n
+A=\Biggl\{ \left(\phase + \alpha n\right) \modx 1 : n\in\mathbb{N} \Biggr\},B=\Biggl\{ \left(\phase + \frac{k}{q}\right) \modx 1 : k\in\{0,1,...,q-1\}\Biggr\}.
 \]
-which can be confirmed by noticing that the series is telescoping.\\
-\\
-Lastly, (3) can be calculated as a weighted sum of (1):
-\[
-\sum_{k=0}^{\infty}k\cdot P(\numLaps=k)=\sum_{k=0}^{\infty}k\cdot (S(l))^k(1-S(l))=\sum_{k=0}^{\infty}\left(k(S(l))^k-k(S(l))^{k+1}\right).
-\]
-We will see that this is also a telescoping sum and compute it by expanding and simplifying as follows:
 \begin{align*}
-& \ \sum_{k=0}^{\infty}\left(k(S(l))^k-k(S(l))^{k+1}\right)\\
-= & \ (1)S(l)-(1)(S(l))^2\\
-& + \ (2)(S(l))^2-(2)(S(l))^3\\
-& + \ (3)(S(l))^3-(3)(S(l))^4\\
-& + \ ...\\
-= & \ (1)S(l) + (1)(S(l))^2 + (1)(S(l))^3 + \ ...\\
-= & \ \sum_{k=1}^\infty (S(l))^n=\left(\sum_{k=0}^\infty (S(l))^n\right)-1=\frac{1}{1-S(l)}-1 =\frac{S(l)}{1-S(l)}\\
-= & \frac{e^{-2\lambda/v}}{1-e^{-2\lambda/v}}=\frac{1}{e^{2\lambda/v}-1}=(e^{2\lambda/v}-1)^{-1}.
+    t\in A\implies t=\left(\phase + \frac{pn}{q}\right) \modx 1 
 \end{align*}
-It is important to note that the reasoning for the three general facts that we gathered from the questions:
+and by the division algorithm, $pn=qn'+k$ for some $n'\in\mathbb{N},k\in\{0,1,...,q-1\}$ so
 \begin{align*}
-    & P(\numLaps = n)=(S(l))^n(1-S(l)),\\
-    & P(\numLaps \geq n)=\sum_{k=n}^\infty (S(l))^k(1-S(l))=(S(l))^n,\\
-    & E(\numLaps) =\sum_{k=0}^{\infty}k\cdot (S(l))^k(1-S(l))=\frac{S(l)}{1-S(l)}
+    t =\left(\phase + \frac{qn'+k}{q}\right) \modx 1 =\left(\phase + n'+\frac{k}{q}\right) \modx 1 =\left(\phase +\frac{k}{q}\right) \modx 1\in B.
 \end{align*}
-did not depend on $P(x)$ being exponential. Indeed, these equations are true for any independent events with a survival probability $S(l)$.\footnote{$S(l)$ being the probability that the event continues to happen. These equations are specific to survival probability, meaning that we stop trials once the event fails to happen.}\\
-\\
-\href{https://github.com/g-jensen/stochastic-particles/blob/master/examples/resets.cpp}{Simulation Code on GitHub}
+Thus, $A \subseteq B$.\\
+And for the other way:
+\begin{align*}
+    t\in B
+\end{align*}
+% proof not finished
+\end{proof}
+\end{lemma}
 
-\subsubsection{Limit of E(\# of resets)}
-An interesting fact about $E(\text{\# of resets})$ is that, with an exponential distribution, it becomes essentially linear as $v$ increases. It can be seen that $E(\text{\# of resets})$ becomes arbitrarily close to $\frac{1}{2\lambda}v - \frac{1}{2}$ if we have $S(l)=e^{-2\lambda/v}$ (as shown before) by evaluating the following limit:
+\begin{proposition}
+If $\travelTime=p/q$ in lowest terms, then $\fatalIndex$ exists if and only if
 \[
-\lim_{v\to\infty}\left(E(\text{\# of resets}) - \frac{v}{2\lambda}\right)=\lim_{v\to\infty}\left(\frac{1}{e^{2\lambda/v}-1} - \frac{v}{2\lambda}\right)
+\phase + \frac{q-1}{q} (\modx 1) \in \holeSet.
 \]
-First, we can combine the fractions
+\begin{proof}
+$(\impliedby)$\\
+Notice first that for any general $k\in\mathbb{N}$, there exists $n\in\mathbb{Z}$ and $k'\in\{0,1,...,q-1\}$ such that $k=qn+k'$ and so we have
 \begin{align*}
-\frac{1}{e^{2\lambda/v}-1} - \frac{v}{2\lambda}=\frac{2\lambda - ve^{2\lambda/v}+v}{2\lambda(e^{2\lambda/v}-1)}.
+\left(\phase + \frac{k}{q}\right) \modx 1 = \left(\phase + \frac{qn+k'}{q}\right) \modx 1 = & \left(\phase + n + \frac{k'}{q}\right) \modx 1\\
+= & \left(\phase + \frac{k'}{q}\right) \modx 1.
 \end{align*}
-Now, we can expand the numerators and denominators
-\begin{align*}
-    & {2\lambda - ve^{2\lambda/v}+v}=2\lambda-v\left(1+2\lambda/v+\frac{(2\lambda/v)^2}{2!}+...\right)+v=-\frac{(2\lambda)^2}{2!v}-\frac{(2\lambda)^3}{3!v^2}-\frac{(2\lambda)^4}{4!v^3}-...,\\
-    & {2\lambda(e^{2\lambda/v}-1)}=2\lambda e^{2\lambda/v}-2\lambda=2\lambda\left(1+2\lambda/v+\frac{(2\lambda/v)^2}{2!}+...\right)-2\lambda=\frac{(2\lambda)^2}{v}+\frac{(2\lambda)^3}{2!v^2}+\frac{(2\lambda)^4}{3!v^3}+...\\
-    & \implies \frac{2\lambda - ve^{2\lambda/v}+v}{2\lambda(e^{2\lambda/v}-1)}=\frac{-\frac{(2\lambda)^2}{2!v}-\frac{(2\lambda)^3}{3!v^2}-\frac{(2\lambda)^4}{4!v^3}-...}{\frac{(2\lambda)^2}{v}+\frac{(2\lambda)^3}{2!v^2}+\frac{(2\lambda)^4}{3!v^3}+...}=\frac{\frac{(2\lambda)^2}{v}\left(-\frac{1}{2!}-\frac{2\lambda}{3!v}-\frac{(2\lambda)^2}{4!v^2}-...\right)}{\frac{(2\lambda)^2}{v}\left(1+\frac{2\lambda}{2!v}+\frac{(2\lambda)^2}{3!v^2}+...\right)}
-\end{align*}
-and then look at the limit
-\begin{align*}
-\lim_{v\to\infty}\left(\frac{1}{e^{2\lambda/v}-1} - \frac{v}{2\lambda}\right)=\lim_{v\to\infty}\frac{-\frac{1}{2!}-\frac{2\lambda}{3!v}-\frac{(2\lambda)^2}{4!v^2}-...}{1+\frac{2\lambda}{2!v}+\frac{(2\lambda)^2}{3!v^2}+...}=-\frac{1}{2}.
-\end{align*}
-Thus,
-\[
-\lim_{v\to\infty}\left(\frac{1}{e^{2\lambda/v}-1} - \left(\frac{v}{2\lambda}-\frac{1}{2}\right)\right)=0
-\]
-so $E(\text{\# of resets})$ becomes arbitrarily close to the line $\frac{1}{2\lambda}v-\frac{1}{2}$ as $v$ approaches infinity.
+% also not finished
+\end{proof}
+\end{proposition}
 
-\subsection{Gates and Wait Times}
-Now imagine $x=0$ as a sort of gate that turns ON and OFF periodically. If the particle reaches $x=0$ when the gate is ON, then the particle is allowed to reset and keep going. If the particle reaches $x=0$ when the gate is OFF, it dies. Specifically, the gate is ON for $(0,T_1]$ and then OFF for $(T_1,T_1+T_2]$ and repeats this pattern indefinitely. Based on its velocity, the particle may unluckily become out-of-sync with the gate and frequently die, so we give it the ability to wait. Waiting still drains the life of the particle, but it can wait for an amount of time to try make sure that it reaches $x=0$ when the gates is ON. The particle can wait different times based on the new lifespan it is given after each lap.
-\\
-\\
-The question now becomes: \textbf{What is the optimal wait time during a given lap?} Optimal meaning that the strategy that yields the highest expected number of resets.
-\\
-\\
-The particle can wait at any period during the lap, but it is equivalent if it only waits at the beginning of a lap.
-\\
-\\
-By simplifying to a scenario starting at $t=0$, I've calculated that if the gate starts ON, then
-\[
-\Delta t = \begin{cases}
-  l - \frac{2}{v}, & l \modx (T_1+T_2) \leq T_1\\
-  T_1+\lfloor \frac{l}{T_1+T_2}\rfloor(T_1+T_2)-\frac{2}{v}, & l \modx (T_1+T_2) > T_1
-\end{cases}
-\]
-is the latest time that the particle can start at and still live. Since every lap starts at some offset during an interval when the gate is ON, say some $\Omega \modx (T_1+T_2)\leq T_1$. Then we have the following equation regarding the wait time during a lap:
-\[
-w + \Omega = \Delta t \implies w= \Delta t - \Omega.
-\]
-And if the gate starts OFF, then the cases are swapped with some slight adjustment:
-\[
-\Delta t = \begin{cases}
-  l - \frac{2}{v}, & l \modx (T_1+T_2) > T_1\\
-  \lfloor \frac{l}{T_1+T_2}\rfloor(T_1+T_2)-\frac{2}{v}, & l \modx (T_1+T_2) \leq T_1
-\end{cases}
-\]
-It is possible that $w<0$, implying that the particle will not be able to complete the lap.\\
-So, more formally, $w=\max(\Delta t - \Omega,0)$.
 \bibliographystyle{alpha}
 \bibliography{sample}
 
