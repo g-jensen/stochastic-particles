@@ -37,7 +37,7 @@ fn should_pass_lap_wraps_phase_past_one() {
 fn lap_count_counts_consecutive_passing_laps() {
     assert_eq!(
         lap_count(&frac(0, 1), &frac(3, 10), &frac(1, 2), 100),
-        Some(1)
+        Some(2)
     );
 }
 
@@ -53,7 +53,7 @@ fn lap_count_zero_when_phase_beyond_on_ratio() {
 fn lap_count_offsets_by_phase() {
     assert_eq!(
         lap_count(&frac(3, 50), &frac(11, 20), &frac(13, 20), 100),
-        Some(2)
+        Some(3)
     );
 }
 

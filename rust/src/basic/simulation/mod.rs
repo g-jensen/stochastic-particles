@@ -9,7 +9,7 @@ fn should_pass_lap(
     travel_time: &Fraction,
     on_ratio: &Fraction,
 ) -> bool {
-    (phase + (travel_time * lap_count)) % 1 <= (*on_ratio)
+    (phase + (travel_time * lap_count)) % 1 < (*on_ratio)
 }
 
 pub fn lap_count(
@@ -19,11 +19,11 @@ pub fn lap_count(
     max_laps: u64,
 ) -> Option<u64> {
     let mut num_laps = 0;
-    while should_pass_lap(phase, num_laps + 1, travel_time, on_ratio) {
-        num_laps += 1;
+    while should_pass_lap(phase, num_laps, travel_time, on_ratio) {
         if num_laps > max_laps {
             return None;
         }
+        num_laps += 1;
     }
     Some(num_laps)
 }

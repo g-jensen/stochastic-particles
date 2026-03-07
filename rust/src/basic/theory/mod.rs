@@ -4,12 +4,14 @@ mod test;
 use fraction::Fraction;
 
 fn fractional_part(f: Fraction) -> Fraction {
-    f - f.floor()
+    f % 1
 }
 
 fn should_lap_forever(phase: &Fraction, q: u64, on_ratio: &Fraction) -> bool {
-    (phase + Fraction::new(q - 1,q)).le(on_ratio)
+    (phase + ((((-phase + 1) * q).ceil() - 1) / q)).lt(on_ratio)
 }
+
+// phi + (q-1)/q <= r
 
 fn mod_inverse(p: i64, q: i64) -> i64 {
     let (mut old_r, mut r) = (p, q);
@@ -52,10 +54,10 @@ pub fn lap_count(phase: &Fraction, travel_time: &Fraction, on_ratio: &Fraction) 
     
     let mut m = 0;
     for n in 1..=q {
-        m = (m+p) % q;
-        if fractional_part(phase + Fraction::new(m,q)).gt(on_ratio) {
+        if fractional_part(phase + Fraction::new(m,q)).ge(on_ratio) {
             return Some(n-1);
         }
+        m = (m+p) % q;
     }
-    return None;
+    panic!("Theory is incorrect!")
 }
