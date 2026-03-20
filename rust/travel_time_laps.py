@@ -25,7 +25,7 @@ def load_csv(path):
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            phase, on_ratio, optimal_tt, _optimal_ls = [parse_value(c) for c in row]
+            phase, on_ratio, optimal_tt, _optimal_laps = [parse_value(c) for c in row]
             results[(phase, on_ratio)] = optimal_tt
     return results
 
@@ -114,7 +114,7 @@ def render(path, phases, on_ratios, grid):
 
     ax.set_xlabel("Phase")
     ax.set_ylabel("On Ratio")
-    ax.set_title("Optimal Travel Time (highest lifespan)")
+    ax.set_title("Optimal Travel Time (most laps)")
 
     max_cbar_ticks = int(fig_h / 0.4)
     cbar_tick_indices = thin_ticks(n_colors, max_cbar_ticks)
