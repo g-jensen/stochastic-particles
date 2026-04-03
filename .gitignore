@@ -12,8 +12,8 @@ log
 .lsp
 build
 .venv
-rust/target
-rust/output.csv
-rust/visualize
-rust/laps.csv
-rust/lifespan.csv
+simulation/target
+simulation/output.csv
+simulation/visualize
+simulation/laps.csv
+simulation/lifespan.csv
