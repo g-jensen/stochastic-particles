@@ -51,17 +51,52 @@ def max_denominator(values):
     return max(denoms) if denoms else 1
 
 
-def fraction_label(val, denom_limit):
-    f = Fraction(val).limit_denominator(denom_limit)
-    if f.denominator == 1:
-        return str(f.numerator)
-    return f"{f.numerator}/{f.denominator}"
+def fraction_label(val, common_denom):
+    f = Fraction(val).limit_denominator(1000)
+    numerator = round(f * common_denom)
+    if common_denom == 1:
+        return str(numerator)
+    return f"{numerator}/{common_denom}"
 
 
-def thin_ticks(n, max_ticks):
+def nice_fractions():
+    nice = [0, 1]
+    for d in [10, 8, 6, 5, 4, 3]:
+        for n in range(1, d):
+            f = Fraction(n, d)
+            if f not in nice:
+                nice.append(f)
+    return sorted(set(nice))
+
+
+def select_nice_ticks(values, max_ticks):
+    n = len(values)
     if n <= max_ticks:
         return list(range(n))
-    step = math.ceil(n / max_ticks)
+
+    nice = nice_fractions()
+
+    for num_ticks in range(max_ticks, 2, -1):
+        if n % num_ticks == 0:
+            step = n // num_ticks
+            indices = list(range(0, n, step))
+
+            all_nice = True
+            for idx in indices:
+                f = Fraction(values[idx]).limit_denominator(1000)
+                if f not in nice:
+                    all_nice = False
+                    break
+
+            if all_nice:
+                return indices
+
+    for num_ticks in range(max_ticks, 2, -1):
+        if n % num_ticks == 0:
+            step = n // num_ticks
+            return list(range(0, n, step))
+
+    step = max(1, n // max_ticks)
     return list(range(0, n, step))
 
 
@@ -77,7 +112,7 @@ def render(path, phases, on_ratios, grid):
                 index_grid[yi, xi] = tt_to_index[grid[yi, xi]]
 
     all_values = list(phases) + list(on_ratios) + list(travel_times)
-    denom_limit = max_denominator(all_values) * 2
+    common_denom = max_denominator(all_values)
 
     n_phases = len(phases)
     n_on_ratios = len(on_ratios)
@@ -99,16 +134,13 @@ def render(path, phases, on_ratios, grid):
     )
 
     max_axis_ticks = int(fig_w / 0.5)
-    x_tick_indices = thin_ticks(n_phases, max_axis_ticks)
-    ax.set_xticks(x_tick_indices)
-    ax.set_xticklabels([fraction_label(phases[i], denom_limit) for i in x_tick_indices])
+    tick_indices = select_nice_ticks(phases, max_axis_ticks)
 
-    max_y_ticks = int(fig_h / 0.5)
-    y_tick_indices = thin_ticks(n_on_ratios, max_y_ticks)
-    ax.set_yticks(y_tick_indices)
-    ax.set_yticklabels(
-        [fraction_label(on_ratios[i], denom_limit) for i in y_tick_indices]
-    )
+    ax.set_xticks(tick_indices)
+    ax.set_xticklabels([fraction_label(phases[i], common_denom) for i in tick_indices])
+
+    ax.set_yticks(tick_indices)
+    ax.set_yticklabels([fraction_label(phases[i], common_denom) for i in tick_indices])
 
     ax.tick_params(labelsize=max(8, min(14, int(140 / max(n_phases, n_on_ratios)))))
 
@@ -116,11 +148,25 @@ def render(path, phases, on_ratios, grid):
     ax.set_ylabel("On Ratio")
     ax.set_title("Optimal Travel Time (most laps)")
 
+    actual_values = sorted(set(v for v in grid.flat if not np.isnan(v)))
+    actual_indices = [tt_to_index[val] for val in actual_values]
+
     max_cbar_ticks = int(fig_h / 0.4)
-    cbar_tick_indices = thin_ticks(n_colors, max_cbar_ticks)
-    cbar = fig.colorbar(im, ax=ax, ticks=cbar_tick_indices)
+    selected = select_nice_ticks(
+        [travel_times[i] for i in actual_indices], max_cbar_ticks
+    )
+    selected_indices = [actual_indices[i] for i in selected]
+
+    selected_colors = [cmap(i / (n_colors - 1)) for i in selected_indices]
+    compact_cmap = mcolors.ListedColormap(selected_colors)
+    compact_norm = mcolors.BoundaryNorm(
+        boundaries=np.arange(len(selected_indices) + 1), ncolors=len(selected_indices)
+    )
+
+    sm = plt.cm.ScalarMappable(cmap=compact_cmap, norm=compact_norm)
+    cbar = fig.colorbar(sm, ax=ax, ticks=np.arange(len(selected_indices)) + 0.5)
     cbar.ax.set_yticklabels(
-        [fraction_label(travel_times[i], denom_limit) for i in cbar_tick_indices]
+        [fraction_label(travel_times[i], common_denom) for i in selected_indices]
     )
     cbar.set_label("Travel Time")
 
@@ -130,7 +176,7 @@ def render(path, phases, on_ratios, grid):
         for yi in range(n_on_ratios):
             for xi in range(n_phases):
                 if not np.isnan(grid[yi, xi]):
-                    label = fraction_label(grid[yi, xi], denom_limit)
+                    label = fraction_label(grid[yi, xi], common_denom)
                     bg_val = index_grid[yi, xi] / (n_colors - 1) if n_colors > 1 else 0
                     text_color = "white" if bg_val < 0.5 else "black"
                     ax.text(
