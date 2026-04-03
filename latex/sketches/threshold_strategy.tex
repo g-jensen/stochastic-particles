@@ -1,0 +1,244 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+\title{Threshold Strategy: Unifying Early and Late Arrival}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Motivation}
+
+The early-arrival strategy maximizes lap count by minimizing wait time. The late-arrival strategy maximizes lifespan utilization by positioning carefully. Neither is universally optimal.
+
+A \textbf{threshold strategy} adapts based on the current lifespan $l$:
+\begin{itemize}
+    \item Short $l$: Re-roll quickly (early behavior)
+    \item Long $l$: Position strategically (late behavior)
+\end{itemize}
+
+This document explores what the threshold function $L^*(\Omega)$ should look like.
+
+\section{Setup}
+
+At state $(\Omega, l)$, the particle can:
+\begin{itemize}
+    \item \textbf{Go early}: Wait $w_E$ (minimal), arrive at $\Omega_E$, cost $w_E + \tau$
+    \item \textbf{Go late}: Wait $w_L$ (maximal), arrive at $\Omega_L = T_1$, cost $w_L + \tau$
+\end{itemize}
+
+Feasibility constraints:
+\begin{align}
+    \text{Early feasible} &\iff w_E + \tau \leq l \\
+    \text{Late feasible} &\iff w_L + \tau \leq l
+\end{align}
+
+Since $w_E \leq w_L$, if late is feasible then early is also feasible.
+
+\section{Deriving the Threshold}
+
+\subsection{Attempt 1: Feasibility-Based Threshold}
+
+The simplest threshold: go late when you can, early otherwise.
+\[
+L^*_{\text{feasibility}}(\Omega) = w_L(\Omega) + \tau
+\]
+
+This is what the early strategy already does as a fallback. It doesn't really unify the strategies.
+
+\subsection{Attempt 2: Expected Value Comparison}
+
+Compare single-lap expected values:
+\begin{align}
+    V_E &= 1 + U(\Omega_E) \quad \text{(early)} \\
+    V_L &= 1 + U(\Omega_L) \quad \text{(late)}
+\end{align}
+
+Go late if $V_L > V_E$, i.e., if $U(\Omega_L) > U(\Omega_E)$.
+
+But this ignores the \emph{cost} difference. Late uses more lifespan ($w_L + \tau$ vs $w_E + \tau$). We should account for opportunity cost.
+
+\subsection{Attempt 3: Rate-Based Comparison}
+
+Consider the ``value rate'' — expected future laps per unit time spent:
+\begin{align}
+    R_E &= \frac{1 + U(\Omega_E)}{w_E + \tau} \\
+    R_L &= \frac{1 + U(\Omega_L)}{w_L + \tau}
+\end{align}
+
+Go late if $R_L > R_E$. This accounts for the time cost of waiting.
+
+But this still doesn't depend on $l$. We want the threshold to use information about our current lifespan.
+
+\subsection{Attempt 4: Lifespan-Aware Threshold}
+
+The key insight: with a long lifespan, you can afford to position carefully. With a short lifespan, you need to act fast.
+
+Consider: if $l$ is large, you might be able to do \emph{multiple} early laps before needing to worry. The question is whether multiple early laps beats one late lap.
+
+Let $k = \lfloor (l - \tau) / \tau \rfloor$ be the maximum number of immediate laps possible (ignoring gate constraints). The value of ``spamming'' $k$ early laps is roughly:
+\[
+V_{\text{spam}} \approx k + U(\Omega + k\tau)
+\]
+
+Compare to one late lap:
+\[
+V_{\text{late}} = 1 + U(T_1)
+\]
+
+The threshold should be where these are equal. Roughly:
+\[
+L^* \approx \tau \cdot \left( U(T_1) - U(\Omega_E) + 1 \right)
+\]
+
+This suggests: if the positional advantage $U(T_1) - U(\Omega_E)$ is large, set a high threshold (favor late). If it's small, set a low threshold (favor early).
+
+\subsection{Attempt 5: Simple Quantile-Based Threshold}
+
+A pragmatic approach: set the threshold at some quantile of the lifespan distribution.
+
+Let $L^* = c / \lambda$ for some constant $c > 0$. Then:
+\begin{itemize}
+    \item $c = 0$: Always late (when feasible)
+    \item $c = \infty$: Always early
+    \item $c = 1$: Threshold at the mean lifespan
+    \item $c = \ln 2 \approx 0.69$: Threshold at the median
+\end{itemize}
+
+The optimal $c$ likely depends on the velocity regime:
+\begin{itemize}
+    \item Fast ($\tau \ll T_1$): High $c$ (favor early, spam laps)
+    \item Slow ($\tau > T_1$): Low $c$ (favor late, position matters)
+\end{itemize}
+
+\section{Proposed Threshold Function}
+
+Combining the above insights, a reasonable threshold is:
+\[
+L^*(\Omega) = \alpha \cdot \frac{1}{\lambda} + \beta \cdot (w_L(\Omega) - w_E(\Omega))
+\]
+
+where:
+\begin{itemize}
+    \item $\alpha \geq 0$ controls the baseline threshold (as fraction of mean lifespan)
+    \item $\beta \geq 0$ scales with the wait-time difference (cost of going late)
+\end{itemize}
+
+Special cases:
+\begin{itemize}
+    \item $\alpha = 0, \beta = 0$: Always late (if feasible)
+    \item $\alpha = \infty$: Always early
+    \item $\alpha = 1, \beta = 0$: Go early if $l < $ mean, late if $l \geq$ mean
+\end{itemize}
+
+\section{Simplified Threshold for Implementation}
+
+For initial implementation, use a single-parameter threshold:
+\[
+L^*(\Omega) = c \cdot \frac{1}{\lambda}
+\]
+
+where $c$ is a tunable constant. The strategy becomes:
+\[
+w^* = \begin{cases}
+    w_E(\Omega, l) & \text{if } l < L^*(\Omega) \\
+    w_L(\Omega, l) & \text{if } l \geq L^*(\Omega) \text{ and late is feasible} \\
+    w_E(\Omega, l) & \text{otherwise (fallback)}
+\end{cases}
+\]
+
+We can then sweep over $c \in [0, 5]$ to find the optimal threshold empirically.
+
+\section{Empirical Results}
+
+We implemented the threshold strategy and swept over $c$ values in two regimes.
+
+\subsection{Fast Regime: $\tau = 1 < T_1 = 2$}
+
+Parameters: $v = 2$, $\tau = 1$, $T_1 = 2$, $T_2 = 1$, mean lifespan $= 3$ ($\lambda = 1/3$), $\Omega = 0.5$.
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Strategy} & \textbf{Expected Laps} \\
+\hline
+Late & 1.337 \\
+Threshold $c = 0.5$ & 1.388 \\
+Threshold $c = 1.0$ & 1.843 \\
+Threshold $c = 2.0$ & 1.893 \\
+Threshold $c = 3.0$ & 1.900 \\
+Early & 1.903 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Finding}: In the fast regime, pure early is optimal. As $c \to \infty$, the threshold strategy converges to early. There is no benefit to the hybrid approach.
+
+\subsection{Slow Regime: $\tau = 2.5 > T_1 = 2$}
+
+Parameters: $v = 0.8$, $\tau = 2.5$, $T_1 = 2$, $T_2 = 1$, mean lifespan $= 3$ ($\lambda = 1/3$), $\Omega = 0.5$.
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Strategy} & \textbf{Expected Laps} \\
+\hline
+Early & 0.605 \\
+Threshold $c = 2.0$ & 0.628 \\
+Late & 0.631 \\
+Threshold $c = 0.5$ & 0.631 \\
+Threshold $c = 1.5$ & 0.635 \\
+\textbf{Threshold $c = 1.0$} & \textbf{0.638} \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Finding}: In the slow regime, the threshold strategy with $c \approx 1$ (threshold at mean lifespan) \emph{beats both pure strategies}. This confirms the hypothesis that a hybrid approach can outperform either extreme.
+
+\section{Interpretation}
+
+The results align with our intuition:
+
+\textbf{Fast regime} ($\tau < T_1$): Particles can complete multiple laps per ON window. The ``spam laps'' effect dominates—rapid re-rolling of lifespans is always beneficial. Positioning provides negligible advantage because survival per lap is nearly certain.
+
+\textbf{Slow regime} ($\tau > T_1$): Each lap necessarily crosses the OFF period. Here, the threshold strategy provides genuine value:
+\begin{itemize}
+    \item \textbf{Short lifespan} ($l < $ mean): The particle is unlikely to survive long anyway. Use the early strategy to attempt a quick lap and re-roll.
+    \item \textbf{Long lifespan} ($l \geq $ mean): The particle has ``won the lottery.'' Use this valuable lifespan strategically by positioning at $T_1$ for optimal future phase.
+\end{itemize}
+
+The optimal threshold at $c = 1$ (the mean) makes intuitive sense: lifespans below average are ``unlucky'' and should be re-rolled; lifespans above average are ``lucky'' and should be exploited.
+
+\section{Conclusions}
+
+\begin{enumerate}
+    \item The threshold strategy unifies early and late as special cases ($c = \infty$ and $c = 0$ respectively).
+    
+    \item In the fast regime, pure early is optimal. The threshold strategy offers no improvement.
+    
+    \item In the slow regime, the threshold strategy with $c \approx 1$ outperforms both pure strategies, achieving a $\sim$1\% improvement over late and $\sim$5\% improvement over early.
+    
+    \item The optimal threshold is remarkably simple: $L^* = \text{mean lifespan} = 1/\lambda$.
+\end{enumerate}
+
+\section{Open Questions}
+
+\begin{enumerate}
+    \item Does the optimal $c$ depend on $\Omega$? Our tests used fixed $\Omega = 0.5$.
+    
+    \item Is there a velocity ``crossover'' regime where the optimal $c$ transitions smoothly from high to low?
+    
+    \item Can we derive $c^* = 1$ analytically from the MDP structure?
+    
+    \item For maximizing \emph{survival time} rather than lap count, is late (or a different threshold) optimal?
+\end{enumerate}
+
+\end{document}

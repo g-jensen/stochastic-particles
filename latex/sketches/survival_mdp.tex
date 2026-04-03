@@ -1,0 +1,420 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\ind}{\mathbf{1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{conjecture}{Conjecture}
+
+\title{MDP for Survival Time Optimization}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Setup}
+
+We optimize \textbf{expected survival time}, not lap count.
+
+\begin{definition}[State]
+After completing a lap, the particle is at gate phase $\Omega \in [0, P)$ where $P = T_1 + T_2$ is the gate period. A fresh lifespan $L \sim \text{Exp}(\lambda)$ is drawn.
+\end{definition}
+
+\begin{definition}[Gate]
+The gate is ON during $\Omega \in (0, T_1]$ and OFF during $\Omega \in (T_1, P]$.
+Laps only begin when the gate is ON, so $\Omega \in (0, T_1]$ initially.
+\end{definition}
+
+\begin{definition}[Survival Time Accumulation]
+If the particle waits $w$ then travels $\tau$:
+\begin{itemize}
+    \item Time alive this lap attempt: $\min(L, w + \tau)$
+    \item Survives iff $L \geq w + \tau$ AND gate is ON at arrival
+\end{itemize}
+\end{definition}
+
+\section{Value Function for Survival Time}
+
+\begin{definition}[Value Function]
+$W(\Omega)$ = expected total survival time starting from phase $\Omega$ with a fresh lifespan draw.
+\end{definition}
+
+For a particle at phase $\Omega$ that draws lifespan $L$:
+\begin{itemize}
+    \item It chooses some policy (wait time, or sequence of laps)
+    \item It accumulates survival time until death
+    \item $W(\Omega) = \E_L[\text{survival} \mid \Omega, \text{optimal policy}]$
+\end{itemize}
+
+\section{Two Candidate Strategies}
+
+\subsection{Strategy A: Wait (Late)}
+
+Wait as long as possible, then do one lap arriving at the end of an ON window.
+
+Given $(\Omega, L)$:
+\begin{itemize}
+    \item Target arrival at $\Omega' = T_1$ (end of ON window)
+    \item Required wait: $w = T_1 - \Omega - \tau + kP$ for some $k \geq 0$
+    \item Choose largest $k$ such that $w + \tau \leq L$
+\end{itemize}
+
+If successful:
+\begin{itemize}
+    \item Survival contribution: $w + \tau$ (possibly close to $L$)
+    \item Continuation: $W(T_1)$
+\end{itemize}
+
+If no ON window reachable:
+\begin{itemize}
+    \item Survival contribution: $L$
+    \item Dead
+\end{itemize}
+
+\subsection{Strategy B: Spam (Early)}
+
+Do laps as fast as possible to ``re-roll'' the lifespan.
+
+Given $(\Omega, L)$:
+\begin{itemize}
+    \item Find minimum wait $w_{\min}$ to reach next ON window
+    \item Do lap, arrive at $\Omega'$, get new $L' \sim \text{Exp}(\lambda)$
+    \item Repeat until death
+\end{itemize}
+
+Value of spamming:
+\begin{itemize}
+    \item Each successful lap contributes $w_{\min} + \tau$ to survival
+    \item After $k$ laps, at phase $\Omega_k$ with fresh lifespan
+    \item Expected survival = $\sum_{i=1}^{k}(w_i + \tau) + W(\Omega_k)$ on success path
+\end{itemize}
+
+\section{The Key Tradeoff}
+
+\textbf{Waiting} maximizes survival \emph{conditional on this lifespan}.
+
+\textbf{Spamming} tries to reach a state with potentially better future value.
+
+The question: when is the expected value of spamming higher?
+
+\section{Bellman Equation}
+
+Let $V(\Omega, L)$ = expected survival from state $(\Omega, L)$ under optimal policy.
+
+\[
+V(\Omega, L) = \max_{\text{policies}} \E[\text{survival} \mid \Omega, L, \text{policy}]
+\]
+
+By memorylessness, define:
+\[
+W(\Omega) = \E_{L \sim \text{Exp}(\lambda)}[V(\Omega, L)]
+\]
+
+For a single-lap decision with wait time $w$:
+\begin{itemize}
+    \item Arrival phase: $\Omega' = (\Omega + w + \tau) \mod P$
+    \item Gate open at arrival: $\Omega' \in (0, T_1]$
+    \item Survival contribution: $\min(L, w + \tau)$
+\end{itemize}
+
+\[
+V(\Omega, L) = \max_{w \geq 0} \left\{
+\min(L, w + \tau) + \ind[L \geq w + \tau] \cdot \ind[\Omega' \in (0, T_1]] \cdot W(\Omega')
+\right\}
+\]
+
+\section{Simplification: Two Actions}
+
+Rather than optimizing over continuous $w$, consider two discrete actions:
+\begin{enumerate}
+    \item \textbf{Early}: Wait minimum time to reach start of next ON window
+    \item \textbf{Late}: Wait maximum time to reach end of an ON window before death
+\end{enumerate}
+
+Let $w_E(\Omega)$ = minimum wait from $\Omega$ to reach an ON window.
+Let $w_L(\Omega, L)$ = maximum wait from $\Omega$ such that $w + \tau \leq L$ and arrival is in ON window.
+
+\subsection{Value of Early}
+
+\[
+V_E(\Omega, L) = \begin{cases}
+(w_E + \tau) + W(\Omega_E) & \text{if } L \geq w_E + \tau \\
+L & \text{otherwise}
+\end{cases}
+\]
+
+where $\Omega_E = (\Omega + w_E + \tau) \mod P$ is the arrival phase (near start of ON window).
+
+\subsection{Value of Late}
+
+\[
+V_L(\Omega, L) = \begin{cases}
+L + W(T_1) & \text{if } L \geq w_L + \tau \text{ for some valid } w_L \\
+L & \text{otherwise (wait until death)}
+\end{cases}
+\]
+
+Wait—this isn't quite right. If late is possible, the survival contribution is $w_L + \tau$, which is close to but not equal to $L$ (it's the largest feasible wait+travel).
+
+Let me reconsider...
+
+\subsection{Corrected Value of Late}
+
+If we can reach an ON window with late strategy:
+\begin{itemize}
+    \item Choose $w_L$ maximal such that $w_L + \tau \leq L$ and $(\Omega + w_L + \tau) \mod P \in (0, T_1]$
+    \item Survival contribution: $w_L + \tau$
+    \item Continuation: $W(T_1)$ (since we arrive at end of ON window)
+\end{itemize}
+
+\[
+V_L(\Omega, L) = \begin{cases}
+(w_L + \tau) + W(T_1) & \text{if reachable} \\
+L & \text{otherwise}
+\end{cases}
+\]
+
+\section{When is Early Better?}
+
+Early is better than Late when:
+\[
+V_E(\Omega, L) > V_L(\Omega, L)
+\]
+
+Case 1: Both can complete a lap.
+\[
+(w_E + \tau) + W(\Omega_E) > (w_L + \tau) + W(T_1)
+\]
+\[
+W(\Omega_E) - W(T_1) > w_L - w_E
+\]
+
+The LHS is the advantage of arriving at $\Omega_E$ vs $T_1$.
+The RHS is the extra survival time from waiting longer.
+
+If $W$ is monotonic, this gives a threshold condition.
+
+Case 2: Only Early can complete a lap (Late would die).
+
+This happens when $L < w_L^{\min} + \tau$ but $L \geq w_E + \tau$.
+
+Then Early gets $(w_E + \tau) + W(\Omega_E)$ and Late gets $L$.
+
+Early is better iff:
+\[
+(w_E + \tau) + W(\Omega_E) > L
+\]
+
+\section{The Spam Value}
+
+What if instead of one Early lap, we do $k$ Early laps?
+
+Expected value of $k$-lap spam starting from $(\Omega, L)$:
+\[
+V_{\text{spam}}^{(k)}(\Omega, L) = \E\left[\sum_{i=1}^{k} (w_i + \tau) \cdot \ind[\text{survived } i \text{ laps}] + W(\Omega_k) \cdot \ind[\text{survived } k \text{ laps}]\right]
+\]
+
+This is complex because each lap depends on the new lifespan draw.
+
+\subsection{Expected Laps from Spamming}
+
+Let $N(\Omega)$ = expected number of laps completed by spamming from phase $\Omega$.
+
+$N(\Omega)$ satisfies:
+\[
+N(\Omega) = \Prob(L \geq w_E + \tau) \cdot (1 + N(\Omega_E))
+\]
+
+Let $p = \Prob(L \geq w_E + \tau) = e^{-\lambda(w_E + \tau)}$.
+
+If spamming always lands at the same phase $\Omega_E$ (which happens if $w_E + \tau$ is a multiple of $P$... not generally true), then:
+\[
+N(\Omega) = p(1 + N(\Omega_E))
+\]
+
+In general, the phase evolves, making this a Markov chain on $[0, P)$.
+
+\section{Conjecture: Threshold Structure}
+
+\begin{conjecture}
+There exists a threshold $c^*(\Omega)$ such that:
+\begin{itemize}
+    \item If $L < c^*(\Omega)$: Spam (go early, try to re-roll)
+    \item If $L \geq c^*(\Omega)$: Wait (go late, maximize current life)
+\end{itemize}
+
+Moreover, $c^*(\Omega)$ may be constant (independent of $\Omega$) under certain symmetry conditions.
+\end{conjecture}
+
+\textbf{Intuition}: 
+\begin{itemize}
+    \item Small $L$: You're going to die soon anyway. Might as well try for a re-roll.
+    \item Large $L$: You have runway. Don't waste it—wait as long as possible.
+\end{itemize}
+
+The threshold $c^*$ balances:
+\begin{itemize}
+    \item Value of re-roll: $W(\Omega_E)$
+    \item Cost of re-roll: Lost waiting time ($w_L - w_E$)
+\end{itemize}
+
+\section{Solving for $W(\Omega)$}
+
+Under the threshold policy with threshold $c$:
+\[
+W(\Omega) = \E_L[V(\Omega, L; c)]
+\]
+
+where $V(\Omega, L; c) = V_E(\Omega, L)$ if $L < c$ and $V(\Omega, L; c) = V_L(\Omega, L)$ if $L \geq c$.
+
+This gives a fixed-point equation for $W(\Omega)$ as a function of $c$.
+
+The optimal $c^*$ maximizes $W(\Omega)$.
+
+\section{Warm-up: No Gate}
+
+As a sanity check, consider the case with no gate (gate always open).
+
+Every lap takes exactly $\tau$. No waiting. The value function $W$ satisfies:
+\[
+W = \E_L[\min(L, \tau) + \ind[L \geq \tau] \cdot W]
+\]
+
+Compute $\E[\min(L, \tau)]$ for $L \sim \text{Exp}(\lambda)$:
+\begin{align*}
+\E[\min(L, \tau)] &= \int_0^\tau L \lambda e^{-\lambda L} dL + \tau \cdot \Prob(L \geq \tau) \\
+&= \frac{1}{\lambda}(1 - e^{-\lambda\tau}) - \tau e^{-\lambda\tau} + \tau e^{-\lambda\tau} \\
+&= \frac{1}{\lambda}(1 - e^{-\lambda\tau})
+\end{align*}
+
+So:
+\[
+W = \frac{1}{\lambda}(1 - e^{-\lambda\tau}) + e^{-\lambda\tau} W
+\]
+\[
+W(1 - e^{-\lambda\tau}) = \frac{1}{\lambda}(1 - e^{-\lambda\tau})
+\]
+\[
+W = \frac{1}{\lambda} = \mu
+\]
+
+\textbf{Result:} Without a gate, expected survival time equals the mean lifespan $\mu$. This matches intuition—on average, you live exactly as long as your expected lifespan.
+
+\section{With Gate: Fixed Point Equation}
+
+With a gate, let's derive $W(\Omega)$ under a threshold policy.
+
+Assume threshold $c$: spam if $L < c$, wait if $L \geq c$.
+
+\textbf{Case: $L \geq c$ (Wait/Late)}
+
+Target the end of an ON window. Let $w_L(\Omega, L)$ be the wait time to arrive at $T_1$.
+
+If we can reach an ON window (i.e., $\exists k \geq 0$ with $w_L + \tau \leq L$):
+\begin{itemize}
+    \item Survival: $w_L + \tau$
+    \item Continuation: $W(T_1)$
+\end{itemize}
+
+Otherwise (lifespan too short to reach any window):
+\begin{itemize}
+    \item Survival: $L$
+    \item Dead
+\end{itemize}
+
+\textbf{Case: $L < c$ (Spam/Early)}
+
+Do lap as fast as possible. Let $w_E(\Omega)$ be minimum wait to reach an ON window.
+
+If $L \geq w_E + \tau$:
+\begin{itemize}
+    \item Survival: $w_E + \tau$
+    \item Continuation: $W(\Omega_E)$ where $\Omega_E = (\Omega + w_E + \tau) \mod P$
+\end{itemize}
+
+Otherwise:
+\begin{itemize}
+    \item Survival: $L$
+    \item Dead
+\end{itemize}
+
+\subsection{Fixed Point}
+
+\[
+W(\Omega) = \underbrace{\int_0^c V_E(\Omega, L) \lambda e^{-\lambda L} dL}_{\text{spam regime}} + \underbrace{\int_c^\infty V_L(\Omega, L) \lambda e^{-\lambda L} dL}_{\text{wait regime}}
+\]
+
+This is an integral equation in $W$. The solution depends on $c$.
+
+\section{Finding Optimal $c^*$}
+
+The optimal threshold $c^*(\Omega)$ satisfies:
+\[
+\frac{d}{dc} W(\Omega; c) = 0
+\]
+
+At $L = c$, the particle is indifferent between spam and wait:
+\[
+V_E(\Omega, c) = V_L(\Omega, c)
+\]
+
+This gives:
+\[
+(w_E + \tau) + W(\Omega_E) = (w_L + \tau) + W(T_1)
+\]
+\[
+W(\Omega_E) - W(T_1) = w_L - w_E
+\]
+
+\textbf{Interpretation:} The gain in future value from arriving at $\Omega_E$ instead of $T_1$ must equal the lost waiting time.
+
+\section{Special Case: $\Omega_E = T_1$}
+
+If early and late both arrive at $T_1$ (e.g., symmetric gate timing), then:
+\[
+W(T_1) - W(T_1) = w_L - w_E
+\]
+\[
+0 = w_L - w_E
+\]
+
+This is only satisfied if $w_L = w_E$, meaning early and late are the same strategy.
+
+In general, $\Omega_E \neq T_1$, so the threshold is non-trivial.
+
+\section{Hypothesis: One Discontinuity}
+
+The user's intuition: there should be ``one discontinuity''—a single threshold $c^*$.
+
+\textbf{Why this might be true:}
+\begin{itemize}
+    \item $V_E(\Omega, L)$ is linear in $L$ (for small $L$, you die; for larger $L$, you complete a lap)
+    \item $V_L(\Omega, L)$ is also piecewise linear in $L$
+    \item The crossing point defines $c^*$
+\end{itemize}
+
+\textbf{Potential complication:}
+\begin{itemize}
+    \item With multiple ON windows reachable, there might be multiple crossing points
+    \item But likely only one is optimal (the first crossing from below?)
+\end{itemize}
+
+\section{Next Steps}
+
+\begin{enumerate}
+    \item Compute $W(\Omega)$ for a threshold policy (closed form?)
+    \item Optimize over $c$ to find $c^*$
+    \item Check if $c^*$ is independent of $\Omega$
+    \item Verify against simulation
+    \item If $c^*$ has a clean form, prove optimality of threshold policy class
+\end{enumerate}
+
+\end{document}

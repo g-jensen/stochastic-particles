@@ -1,0 +1,143 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+
+\newtheorem{definition}{Definition}
+\newtheorem{observation}{Observation}
+
+\title{The Early-Arrival Strategy}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Motivation}
+
+The original wait-time strategy (``late arrival'') was designed to position the particle at the end of the ON window, with the intuition that this would maximize future flexibility. However, simulation results revealed that a simpler ``early arrival'' strategy significantly outperforms it, particularly when the lap time $\tau$ is small relative to the ON period $T_1$.
+
+This document describes the early-arrival strategy, explains why it works, and identifies the regime where it excels.
+
+\section{Setup}
+
+Recall the problem parameters:
+\begin{itemize}
+    \item Particle velocity $v > 0$, giving lap time $\tau = 2/v$
+    \item Lifespan $l \sim \text{Exp}(\lambda)$, refreshed after each successful lap
+    \item Gate ON during $(0, T_1]$, OFF during $(T_1, T_1 + T_2]$, with period $T = T_1 + T_2$
+    \item Current offset $\Omega \in (0, T_1]$: position in the gate cycle when a lap begins
+\end{itemize}
+
+A particle at offset $\Omega$ with lifespan $l$ must choose a wait time $w \geq 0$. After waiting $w$ and traveling for $\tau$, it arrives at:
+\[
+\Omega' = (\Omega + w + \tau) \mod T
+\]
+The lap succeeds if $\Omega' \in (0, T_1]$ and $w + \tau \leq l$.
+
+\section{The Early-Arrival Strategy}
+
+\begin{definition}[Early-Arrival Strategy]
+Given state $(\Omega, l)$, the early-arrival strategy chooses the minimum wait time $w^*$ such that:
+\begin{enumerate}
+    \item The arrival $\Omega' = (\Omega + w^* + \tau) \mod T$ lies in the ON window $(0, T_1]$
+    \item The particle survives: $w^* + \tau \leq l$
+\end{enumerate}
+If no such $w^*$ exists, the particle cannot complete a lap and dies.
+\end{definition}
+
+Concretely:
+\begin{itemize}
+    \item If $(\Omega + \tau) \mod T \in (0, T_1]$, then $w^* = 0$ (immediate departure lands in ON window)
+    \item Otherwise, compute the minimum wait to reach the next ON window
+    \item If even this minimum wait exceeds available lifespan, fall back to the late-arrival strategy (which targets the latest reachable ON window)
+\end{itemize}
+
+\section{Why Early Arrival Works}
+
+\subsection{The ``Spam Laps'' Phenomenon}
+
+When $\tau < T_1$, a particle can complete multiple laps within a single ON period. Consider a particle at offset $\Omega$ with $\Omega + \tau \leq T_1$:
+\begin{itemize}
+    \item Immediate departure: arrive at $\Omega' = \Omega + \tau$, still in ON window
+    \item Get fresh lifespan $l'$
+    \item If $\Omega' + \tau \leq T_1$, can immediately do another lap
+    \item Repeat until either $\Omega^{(k)} + \tau > T_1$ or unlucky lifespan
+\end{itemize}
+
+Each lap takes only $\tau$ time but grants a completely fresh lifespan draw. This creates a ``re-rolling'' effect: short lifespans are quickly replaced, while a lucky long lifespan provides a buffer for future laps.
+
+\subsection{Phase Preservation}
+
+The early strategy preserves the particle's phase relationship with the gate:
+\[
+\Omega' = \Omega + \tau \pmod{T}
+\]
+If $\Omega$ is in a favorable position (where immediate departure lands in ON), then $\Omega'$ is often also favorable. The particle stays synchronized with the gate.
+
+In contrast, the late-arrival strategy actively repositions to $\Omega' = T_1$ every lap, which may not be optimal.
+
+\subsection{Value Function Structure}
+
+Simulation reveals that $U(\Omega)$---the expected laps starting from offset $\Omega$---is \emph{increasing} in $\Omega$ within certain regions. This is counterintuitive: being closer to the end of the ON window (larger $\Omega$) yields higher expected laps.
+
+The explanation: larger $\Omega$ means the next OFF period is closer, but after crossing it, the particle emerges early in the next ON period with maximum runway. The value $U$ balances:
+\begin{itemize}
+    \item Immediate survival probability (favors small $\Omega$, more room in current window)
+    \item Future positioning (favors large $\Omega$, better phase after crossing OFF)
+\end{itemize}
+
+For fast particles ($\tau \ll T_1$), immediate survival is nearly guaranteed for any $\Omega$, so future positioning dominates.
+
+\section{Regime Analysis}
+
+\begin{observation}[Fast Regime: $\tau < T_1$]
+Early arrival significantly outperforms late arrival. Simulation shows improvements of 40--60\% in expected laps. The particle can ``spam laps'' to re-roll lifespans rapidly.
+\end{observation}
+
+\begin{observation}[Medium Regime: $T_1 < \tau < T$]
+Early and late strategies perform similarly. Each lap necessarily crosses into the OFF period, so phase positioning matters less.
+\end{observation}
+
+\begin{observation}[Slow Regime: $\tau > T$]
+Both strategies reduce to similar behavior---the particle wraps around multiple gate cycles per lap. Strategy differences are minimal.
+\end{observation}
+
+\section{Comparison with Upper and Lower Bounds}
+
+For a particle with velocity $v$ and mean lifespan $1/\lambda$:
+
+\textbf{Upper bound} (no gate): 
+\[
+\E[\text{laps}] = \frac{e^{-\lambda\tau}}{1 - e^{-\lambda\tau}} = \frac{1}{e^{\lambda\tau} - 1}
+\]
+
+\textbf{Lower bound} (gate, no waiting): Particles depart immediately regardless of phase. Many die by arriving during OFF.
+
+\textbf{Early strategy}: Achieves values between these bounds, closer to upper bound when $\tau < T_1$.
+
+\textbf{Late strategy}: Also between bounds, but typically 30--50\% lower than early in the fast regime.
+
+\section{Open Questions}
+
+\begin{enumerate}
+    \item \textbf{Optimality}: Is early-arrival actually optimal, or is there a better strategy? The MDP framework suggests the optimal strategy maximizes $U(\Omega')$ over reachable $\Omega'$. If $U$ is monotonic, either pure-early or pure-late is optimal. But $U$ may have more complex structure.
+    
+    \item \textbf{Analytical form}: Can we derive $U(\Omega)$ analytically for the early strategy? The fixed-point equation is:
+    \[
+    U(\Omega) = \int_0^\infty \lambda e^{-\lambda l} \cdot V(\Omega, l) \, dl
+    \]
+    where $V(\Omega, l) = 1 + U(\Omega')$ if a lap is possible, else 0.
+    
+    \item \textbf{Threshold policies}: Perhaps the optimal strategy is neither pure-early nor pure-late, but a threshold policy: ``go early if $l < L^*(\Omega)$, else position carefully.'' This would balance re-rolling (for short $l$) against strategic positioning (for long $l$).
+\end{enumerate}
+
+\section{Conclusion}
+
+The early-arrival strategy succeeds by maximizing the lap rate. Each lap is cheap (costs only $\tau$ time) but valuable (refreshes lifespan entirely). In the fast regime, this ``spam laps'' approach dramatically outperforms careful positioning.
+
+The key insight: when survival per lap is nearly certain, \emph{more laps is better than better-positioned laps}.
+
+\end{document}
