@@ -25,8 +25,8 @@ def load_csv(path):
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            phase, on_ratio, optimal_tt, _optimal_laps = [parse_value(c) for c in row]
-            results[(phase, on_ratio)] = optimal_tt
+            phase, on_ratio, _optimal_tt, optimal_laps = [parse_value(c) for c in row]
+            results[(phase, on_ratio)] = optimal_laps
     return results
 
 
@@ -35,10 +35,10 @@ def build_grid(results):
     on_ratios = sorted(set(k[1] for k in results))
 
     grid = np.full((len(on_ratios), len(phases)), np.nan)
-    for (phase, on_ratio), travel_time in results.items():
+    for (phase, on_ratio), laps in results.items():
         xi = phases.index(phase)
         yi = on_ratios.index(on_ratio)
-        grid[yi, xi] = travel_time
+        grid[yi, xi] = laps
 
     return phases, on_ratios, grid
 
@@ -52,11 +52,21 @@ def max_denominator(values):
 
 
 def fraction_label(val, common_denom):
+    if math.isinf(val):
+        return "∞"
     f = Fraction(val).limit_denominator(1000)
     numerator = round(f * common_denom)
     if common_denom == 1:
         return str(numerator)
     return f"{numerator}/{common_denom}"
+
+
+def decimal_label(val):
+    if math.isinf(val):
+        return "∞"
+    if val == 0:
+        return "0"
+    return f"{val:.2g}"
 
 
 def nice_fractions():
@@ -83,10 +93,12 @@ def select_nice_ticks(values, max_ticks):
 
             all_nice = True
             for idx in indices:
-                f = Fraction(values[idx]).limit_denominator(1000)
-                if f not in nice:
-                    all_nice = False
-                    break
+                val = values[idx]
+                if not math.isinf(val):
+                    f = Fraction(val).limit_denominator(1000)
+                    if f not in nice:
+                        all_nice = False
+                        break
 
             if all_nice:
                 return indices
@@ -101,17 +113,23 @@ def select_nice_ticks(values, max_ticks):
 
 
 def render(path, phases, on_ratios, grid):
-    granularity = len(phases)
-    travel_times = [k / granularity for k in range(1, granularity)]
-    n_colors = len(travel_times)
-    tt_to_index = {tt: i for i, tt in enumerate(travel_times)}
+    finite_vals = [v for v in grid.flat if not np.isnan(v) and not math.isinf(v)]
+    has_inf = any(math.isinf(v) for v in grid.flat if not np.isnan(v))
+
+    laps = sorted(set(finite_vals))
+    if has_inf:
+        laps.append(math.inf)
+
+    n_colors = len(laps)
+    laps_to_index = {l: i for i, l in enumerate(laps)}
     index_grid = np.full_like(grid, np.nan)
     for yi in range(grid.shape[0]):
         for xi in range(grid.shape[1]):
-            if not np.isnan(grid[yi, xi]):
-                index_grid[yi, xi] = tt_to_index[grid[yi, xi]]
+            val = grid[yi, xi]
+            if not np.isnan(val):
+                index_grid[yi, xi] = laps_to_index[val]
 
-    all_values = list(phases) + list(on_ratios) + list(travel_times)
+    all_values = list(phases) + list(on_ratios) + [v for v in laps if not math.isinf(v)]
     common_denom = max_denominator(all_values)
 
     n_phases = len(phases)
@@ -121,7 +139,12 @@ def render(path, phases, on_ratios, grid):
     fig_h = 10
     cell_size = min((fig_w - 2.5) / n_phases, (fig_h - 2) / n_on_ratios)
 
-    cmap = plt.cm.viridis.resampled(n_colors)
+    if has_inf:
+        base_cmap = plt.cm.viridis.resampled(n_colors - 1)
+        colors = [base_cmap(i) for i in range(n_colors - 1)] + [(1.0, 0.4, 0.4, 1.0)]
+        cmap = mcolors.ListedColormap(colors)
+    else:
+        cmap = plt.cm.viridis.resampled(n_colors)
     norm = mcolors.BoundaryNorm(boundaries=np.arange(-0.5, n_colors), ncolors=n_colors)
 
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
@@ -146,37 +169,35 @@ def render(path, phases, on_ratios, grid):
 
     ax.set_xlabel(r"$\phi$")
     ax.set_ylabel(r"$r$")
-    ax.set_title(r"Largest $\alpha$ that results in largest $N_\alpha(\phi, r)$")
-
-    actual_values = sorted(set(v for v in grid.flat if not np.isnan(v)))
-    actual_indices = [tt_to_index[val] for val in actual_values]
+    ax.set_title(r"Largest possible $N_\alpha(ϕ, r)$")
 
     max_cbar_ticks = int(fig_h / 0.4)
-    selected = select_nice_ticks(
-        [travel_times[i] for i in actual_indices], max_cbar_ticks
-    )
-    selected_indices = [actual_indices[i] for i in selected]
+    selected = select_nice_ticks(laps, max_cbar_ticks)
 
-    selected_colors = [cmap(i / (n_colors - 1)) for i in selected_indices]
+    if has_inf and (len(laps) - 1) not in selected:
+        selected.append(len(laps) - 1)
+
+    selected_colors = [
+        cmap(i / (n_colors - 1)) if i < n_colors else cmap(1.0) for i in selected
+    ]
     compact_cmap = mcolors.ListedColormap(selected_colors)
     compact_norm = mcolors.BoundaryNorm(
-        boundaries=np.arange(len(selected_indices) + 1), ncolors=len(selected_indices)
+        boundaries=np.arange(len(selected) + 1), ncolors=len(selected)
     )
 
     sm = plt.cm.ScalarMappable(cmap=compact_cmap, norm=compact_norm)
-    cbar = fig.colorbar(sm, ax=ax, ticks=np.arange(len(selected_indices)) + 0.5)
-    cbar.ax.set_yticklabels(
-        [fraction_label(travel_times[i], common_denom) for i in selected_indices]
-    )
-    cbar.set_label(r"$\alpha$")
+    cbar = fig.colorbar(sm, ax=ax, ticks=np.arange(len(selected)) + 0.5)
+    cbar.ax.set_yticklabels([decimal_label(laps[i]) for i in selected])
+    cbar.set_label(r"$N_\alpha$")
 
     show_labels = cell_size >= 0.5
     if show_labels:
         fontsize = max(4, min(7, int(cell_size * 8)))
         for yi in range(n_on_ratios):
             for xi in range(n_phases):
-                if not np.isnan(grid[yi, xi]):
-                    label = fraction_label(grid[yi, xi], common_denom)
+                val = grid[yi, xi]
+                if not np.isnan(val):
+                    label = fraction_label(val, common_denom)
                     bg_val = index_grid[yi, xi] / (n_colors - 1) if n_colors > 1 else 0
                     text_color = "white" if bg_val < 0.5 else "black"
                     ax.text(
