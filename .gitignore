@@ -14,3 +14,6 @@ build
 .venv
 rust/target
 rust/output.csv
+rust/visualize
+rust/laps.csv
+rust/lifespan.csv
