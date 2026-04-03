@@ -1,6 +1,6 @@
 #!/bin/bash
 
-granularities=(20 50 100 200 300 400)
+granularities=(24 120 720)
 
 cargo build --bin basic-generate --bin basic-generate-laps --release
 mkdir -p visualize
