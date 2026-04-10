@@ -169,7 +169,7 @@ def render(path, phases, on_ratios, grid):
 
     ax.set_xlabel(r"$\phi$")
     ax.set_ylabel(r"$r$")
-    ax.set_title(r"Largest possible $N_\alpha(ϕ, r)$")
+    # ax.set_title(r"$N_{\alpha_{N}^{*}}(\phi, r)$")
 
     max_cbar_ticks = int(fig_h / 0.4)
     selected = select_nice_ticks(laps, max_cbar_ticks)
@@ -188,7 +188,7 @@ def render(path, phases, on_ratios, grid):
     sm = plt.cm.ScalarMappable(cmap=compact_cmap, norm=compact_norm)
     cbar = fig.colorbar(sm, ax=ax, ticks=np.arange(len(selected)) + 0.5)
     cbar.ax.set_yticklabels([decimal_label(laps[i]) for i in selected])
-    cbar.set_label(r"$N_\alpha$")
+    cbar.set_label(r"$N_{\alpha_{N}^{*}}(\phi, r)$")
 
     show_labels = cell_size >= 0.5
     if show_labels:

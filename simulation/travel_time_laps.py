@@ -146,7 +146,7 @@ def render(path, phases, on_ratios, grid):
 
     ax.set_xlabel(r"$\phi$")
     ax.set_ylabel(r"$r$")
-    ax.set_title(r"Largest $\alpha$ that results in largest $N_\alpha(\phi, r)$")
+    # ax.set_title(r"$\alpha_{N}^{*}$")
 
     actual_values = sorted(set(v for v in grid.flat if not np.isnan(v)))
     actual_indices = [tt_to_index[val] for val in actual_values]
@@ -168,7 +168,7 @@ def render(path, phases, on_ratios, grid):
     cbar.ax.set_yticklabels(
         [fraction_label(travel_times[i], common_denom) for i in selected_indices]
     )
-    cbar.set_label(r"$\alpha$")
+    cbar.set_label(r"$\alpha_{N}^{*}$")
 
     show_labels = cell_size >= 0.5
     if show_labels:
