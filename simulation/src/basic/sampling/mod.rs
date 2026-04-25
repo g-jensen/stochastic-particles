@@ -16,7 +16,7 @@ pub fn sample_on_ratio(
     granularity: u64,
     callback: &mut impl FnMut(Fraction),
 ) {
-    each_unit_fraction(granularity, 1, &mut |on_ratio| {
+    each_unit_fraction(granularity, 0, &mut |on_ratio| {
         callback(on_ratio)
     });
 }
