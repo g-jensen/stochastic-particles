@@ -14,10 +14,11 @@ path = "src/bin/basic/generate.rs"
 name = "basic-validate"
 path = "src/bin/basic/validate.rs"
 
+
+[[bin]]
+name = "basic-validate-granularity"
+path = "src/bin/basic/validate_granularity.rs"
+
 [[bin]]
 name = "basic-generate-laps"
 path = "src/bin/basic/generate_laps.rs"
-
-[[bin]]
-name = "basic-generate-test"
-path = "src/bin/basic/generate_test.rs"
