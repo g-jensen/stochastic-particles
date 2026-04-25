@@ -2,7 +2,8 @@ use std::fs::File;
 use std::io::{self, BufWriter, Write};
 
 use fraction::{ConstOne, Fraction};
-use stochastic::basic::{laps, sampling, simulation, theory};
+use stochastic::basic::simulation::laps;
+use stochastic::basic::{sampling, simulation, theory};
 use stochastic::cli::arg;
 
 #[derive(Debug)]

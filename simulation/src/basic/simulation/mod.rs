@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod test;
 
+pub mod laps;
+pub mod lifespan;
+
 use fraction::Fraction;
 
 fn should_pass_lap(

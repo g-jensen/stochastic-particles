@@ -1,5 +1,6 @@
 use fraction::Fraction;
-use stochastic::basic::{laps, theory};
+use stochastic::basic::simulation::laps;
+use stochastic::basic::{theory};
 use stochastic::cli::{arg};
 
 fn format_lap_count(lap_count: Option<u64>) -> String {
