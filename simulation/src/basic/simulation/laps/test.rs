@@ -72,7 +72,7 @@ fn optimize_forwards_phase_and_on_ratio_to_lap_fn() {
 }
 
 #[test]
-fn optimize_tie_prefers_keeps_both_travel_time() {
+fn optimize_tie_keeps_all_travel_times() {
     let result = optimize(
         frac(1, 4),
         frac(1, 2),
