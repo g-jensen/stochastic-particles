@@ -15,7 +15,7 @@ fn main() -> io::Result<()> {
     let args: Vec<String> = std::env::args().collect();
     let phase = arg(&args, "-phase", Fraction::new(1_u64, 2_u64));
     let on_ratio = arg(&args, "-on_ratio", Fraction::new(1_u64, 2_u64));
-    let granularity = arg(&args, "-granularity", 10);
+    let granularity = arg(&args, "-granularity", 120);
     let max_travel_time = arg(&args, "-max-travel-time", Fraction::ONE);
     let max_laps = arg(&args, "-max-laps", granularity+1);
     // let output_path = arg(&args, "-output", String::from("output.csv"));
