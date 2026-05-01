@@ -18,8 +18,10 @@ fn main() {
     let first_granularity = arg(&args, "-g1", 120);
     let second_granularity = arg(&args, "-g2", 720);
 
-    let (first_travel_time, first_lap_count) = laps::optimize(phase, on_ratio, first_granularity, max_travel_time, theory::lap_count);
-    let (second_travel_time, second_lap_count) = laps::optimize(phase, on_ratio, second_granularity, max_travel_time, theory::lap_count);
+    let (first_travel_times, first_lap_count) = laps::optimize(phase, on_ratio, first_granularity, max_travel_time, theory::lap_count);
+    let (second_travel_times, second_lap_count) = laps::optimize(phase, on_ratio, second_granularity, max_travel_time, theory::lap_count);
+    let first_travel_time = first_travel_times.last().unwrap();
+    let second_travel_time = second_travel_times.last().unwrap();
     let formatted_first_lap_count = format_lap_count(first_lap_count);
     let formatted_second_lap_count = format_lap_count(second_lap_count);
 

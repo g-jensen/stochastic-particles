@@ -40,7 +40,7 @@ fn main() -> io::Result<()> {
                 Strategy::THEORY => lap_fn = &theory::lap_count,
                 Strategy::SIMULATION => lap_fn = simulation_lap_fn,
             }
-            let (travel_time, lap_count) =
+            let (travel_times, lap_count) =
                 laps::optimize(phase, on_ratio, granularity, max_travel_time, lap_fn);
             let laps_str = lap_count
                 .map(|n| n.to_string())
@@ -48,7 +48,7 @@ fn main() -> io::Result<()> {
             writeln!(
                 writer,
                 "{}, {}, {}, {}",
-                &phase, &on_ratio, &travel_time, laps_str
+                &phase, &on_ratio, &travel_times.last().unwrap(), laps_str
             )
             .unwrap();
             count += 1;

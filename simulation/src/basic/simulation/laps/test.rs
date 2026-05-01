@@ -10,7 +10,7 @@ fn optimize_single_sample_returns_it() {
         frac(1, 1),
         |_phase, _travel_time, _on_ratio| Some(3),
     );
-    assert_eq!(result, (frac(1, 2), Some(3)));
+    assert_eq!(result, (vec![frac(1, 2)], Some(3)));
 }
 
 #[test]
@@ -30,7 +30,7 @@ fn optimize_picks_largest_lap_count() {
             }
         },
     );
-    assert_eq!(result, (frac(1, 2), Some(10)));
+    assert_eq!(result, (vec![frac(1, 2)], Some(10)));
 }
 
 #[test]
@@ -50,7 +50,7 @@ fn optimize_picks_none_as_infinite_laps() {
             }
         },
     );
-    assert_eq!(result, (frac(1, 2), None));
+    assert_eq!(result, (vec![frac(1, 2)], None));
 }
 
 #[test]
@@ -68,11 +68,11 @@ fn optimize_forwards_phase_and_on_ratio_to_lap_fn() {
             }
         },
     );
-    assert_eq!(result, (frac(2, 3), Some(20)));
+    assert_eq!(result, (vec![frac(2, 3)], Some(20)));
 }
 
 #[test]
-fn optimize_tie_prefers_last_travel_time() {
+fn optimize_tie_prefers_keeps_both_travel_time() {
     let result = optimize(
         frac(1, 4),
         frac(1, 2),
@@ -80,7 +80,7 @@ fn optimize_tie_prefers_last_travel_time() {
         frac(1, 1),
         |_phase, _travel_time, _on_ratio| Some(5),
     );
-    assert_eq!(result, (frac(3, 4), Some(5)));
+    assert_eq!(result, (vec![frac(1, 4),frac(2, 4),frac(3, 4)], Some(5)));
 }
 
 #[test]
@@ -98,5 +98,5 @@ fn optimize_samples_up_to_max_travel_time() {
             }
         },
     );
-    assert_eq!(result, (frac(4, 3), Some(7)));
+    assert_eq!(result, (vec![frac(4, 3)], Some(7)));
 }
