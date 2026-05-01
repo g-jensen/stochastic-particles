@@ -14,6 +14,9 @@ path = "src/bin/basic/generate.rs"
 name = "basic-validate"
 path = "src/bin/basic/validate.rs"
 
+[[bin]]
+name = "multiple-solutions"
+path = "src/bin/basic/multiple_solutions.rs"
 
 [[bin]]
 name = "basic-validate-granularity"
